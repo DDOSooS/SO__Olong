@@ -3,6 +3,15 @@
 #include <stdlib.h>
 #include "so_long.h"
 
+/*
+	check if ther is any valid path on the map
+	for tommorow
+*/
+int ft_check_valid_path(map_data *map)
+{
+	return (1);
+}
+
 void	ft_check_rules(map_data *map)
 {
 	if (map->grid[i][j] == 'c')
@@ -133,6 +142,8 @@ int	ft_validate_map(argv[1])
 	if (!ft_gen_map(&map, fd))
 		return (0);
 	if (!ft_itirate_map(map))
+		return (0);
+	if (!ft_check_valid_path(map))
 		return (0);
 	return (1);
 }

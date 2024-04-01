@@ -3,7 +3,7 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror
 LIBRARY = libft/libft.a
 RM = rm -rf 
-SRC = src/main.c
+SRC = src/main.c gnl/get_next_line.c gnl/get_next_line_utils.c
 OBJ = $(SRC:.c=.o)
 
 all : $(NAME)
@@ -12,7 +12,7 @@ $(LIBRARY) :
 	$(MAKE) -C libft
 
 $(NAME) : $(OBJ) $(LIBRARY)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS)  $^ -o $@
 
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@

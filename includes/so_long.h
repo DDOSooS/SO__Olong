@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/01 10:52:21 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/01 11:54:59 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/01 15:49:31 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 # include <string.h>
 # include <limits.h>
 # include "../libft/libft.h"
+# include <fcntl.h>
+
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 42
 # endif
@@ -27,7 +29,8 @@
     get_next_line functions
 */
 char	*str_sub(char *str, int len);
-int	check_end_line(char *str);
+int     check_end_line(char *str);
+char	*get_next_line(int fd);
 
 /*
     end  of get_next_line functions
@@ -43,7 +46,7 @@ typedef struct enemy
 
 typedef struct map
 {
-    int         **map;
+    int         **grid;
     int         player_pos;
     int         exit_pos;
     int         n_collectible;
@@ -54,10 +57,10 @@ typedef struct map
 
 typedef struct  so_long
 {
-    t_map   *map;
-    t_enemy *enemy;
-    int     cur_moves;
-} t_slong ;
+    t_map	*map;
+    int		cur_moves;
+    // t_enemy *enemy;
+}   t_slong ;
 
 
 # endif

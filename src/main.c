@@ -23,7 +23,7 @@ int ft_count_rows(int fd)
     return n_row;
 }
 
-void ft_free_grid(int **grid, int n_row)
+void ft_free_grid(char **grid, int n_row)
 {
     int i;
 
@@ -56,14 +56,21 @@ int *ft_gen_row(char *line)
     int *row;
     int i;
     int len;
+    char *str;
 
-    row = ft_strtrim(line, "\n");
-    if (! row)
+    i = 0;
+    str = ft_strtrim(line, "\n");
+    if (! str)
         return (NULL);
-    len = ft_strlen(row);
+    len = ft_strlen(str);
+    row = malloc(sizeof(int) * len);
+    if (!row)
+    {
+        return (free(row), NULL);
+    }
     while (i < len)
     {
-        row[i] = line[i] - '0';
+        row[i] = str[i] - '0';
         i++;
     }
     return (row);
@@ -87,7 +94,7 @@ int    ft_gen_map(t_map *map, char *map_file)
         line = get_next_line(fd);
         if (!line)
             return (0);
-        map->grid[i] = ft_gen_row(line);
+        map->grid[i] = ft_strtrim(line, "\n");
         if (!map->grid[i])
             return (free(line), 0);
         free(line);
@@ -151,15 +158,34 @@ int ft_init_requirement(t_slong *game, char *map_file)
     game->map->n_colums = ft_count_collums(map_file, game->map->n_row);
     if (game->map->n_colums < 3)
         return (0);
-    game->map->grid = malloc(sizeof(int *) * game->map->n_row);
+    game->map->grid = malloc(sizeof(char *) * game->map->n_row);
     if (!game->map->grid)
         return (0);
-    if (! ft_gen_map(game->map, map_file, 0))
+    if (! ft_gen_map(game->map, map_file))
         return (0);
     close(fd);
     return 1;
 }
 
+void var_dump(char **map, int row, int col)
+{
+
+    int i;
+    int  j;
+
+    i = 0;
+    while (i < row )
+    {
+        j = 0;
+        while (j < col)
+        {
+                printf("%c", map[i][j]);
+            j++;
+        }
+        printf("\n");
+        i++;
+    }
+}
 int main(int ac, char **av)
 {
     t_slong game;
@@ -172,7 +198,8 @@ int main(int ac, char **av)
         ft_destroy_game(&game);
         return 1;
     }
-
+    var_dump(game.map->grid, game.map->n_row, game.map->n_colums);
+    
     // Other operations if needed
 
     ft_destroy_game(&game);

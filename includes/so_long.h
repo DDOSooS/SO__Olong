@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/01 10:52:21 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/01 15:49:31 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/01 20:14:33 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ typedef struct enemy
 
 typedef struct map
 {
-    int         **grid;
+    char         **grid;
     int         player_pos;
     int         exit_pos;
     int         n_collectible;

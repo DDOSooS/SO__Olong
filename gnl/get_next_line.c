@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddos <ddos@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/15 11:57:08 by aghergho          #+#    #+#             */
-/*   Updated: 2023/12/18 08:42:27 by aghergho         ###   ########.fr       */
+/*   Created: 2024/04/01 10:51:40 by aghergho          #+#    #+#             */
+/*   Updated: 2024/04/01 10:54:24 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "../includes/so_long.h"
 
 char	*edit_line(char *str, int len, char **g_line)
 {

@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aghergho <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/11 16:31:26 by aghergho          #+#    #+#             */
-/*   Updated: 2023/12/11 16:31:29 by aghergho         ###   ########.fr       */
+/*   Created: 2024/04/01 10:55:01 by aghergho          #+#    #+#             */
+/*   Updated: 2024/04/01 10:56:18 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+# include "../includes/so_long.h"
 
 char	*str_sub(char *str, int len)
 {
@@ -32,19 +32,6 @@ char	*str_sub(char *str, int len)
 	return (s);
 }
 
-int	ft_strlen(char *str)
-{
-	int	i;
-
-	if (!str)
-		return (0);
-	i = 0;
-	while (str[i])
-		i++;
-	return (i);
-}
-
-//checking the end_of_line
 int	check_end_line(char *str)
 {
 	int	i;

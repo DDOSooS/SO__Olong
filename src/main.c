@@ -76,9 +76,6 @@ int *ft_gen_row(char *line)
     return (row);
 }
 
-
-
-
 int    ft_gen_map(t_map *map, char *map_file)
 {
     int     fd;
@@ -141,6 +138,22 @@ int ft_count_collums(char *map_file, int n_row)
     return (col);
 }
 
+t_map   *ft_new_map()
+{
+    t_map *map;
+
+    map = malloc(sizeof(t_map));
+    if (!map)
+        return (NULL);
+    map->n_row = 0;
+    map->n_colums = 0;
+    map->player = 0;
+    map->col = 0;
+    map->exit = 0;
+    map->grid = NULL;
+    return (map);
+}
+
 int ft_init_requirement(t_slong *game, char *map_file)
 {
     int fd;
@@ -148,12 +161,11 @@ int ft_init_requirement(t_slong *game, char *map_file)
     fd = open(map_file, O_RDONLY);
     if (fd == -1 || !ft_check_extension(map_file))
         return 0;
-    game->map = malloc(sizeof(t_map));
+    game->map = ft_new_map();
     if (!game->map)
         return 0;
-    game->map->grid = NULL;
     game->map->n_row = ft_count_rows(fd);
-    if (game->map->n_row < 5)
+    if (game->map->n_row < 3)
         return (0);
     game->map->n_colums = ft_count_collums(map_file, game->map->n_row);
     if (game->map->n_colums < 3)
@@ -167,6 +179,94 @@ int ft_init_requirement(t_slong *game, char *map_file)
     return 1;
 }
 
+/*
+    ===> validate map
+*/
+
+int ft_check_walls(char c)
+{
+    if (c == '1')
+        return (1);
+    return (0);
+}
+
+int ft_check_component(t_slong **game, char c)
+{
+    if (c == '1')
+        return (1);
+    else if (c == '0')
+        return (1);
+    else if (c == 'C')
+    {
+        (*game)->map->col = (*game)->map->col + 1;
+        return (1);
+    }
+    else if (c == 'E')
+    {
+        (*game)->map->exit = (*game)->map->exit + 1;
+        return (1);
+    }
+    else if (c == 'P')
+    {
+        (*game)->map->player = (*game)->map->player + 1;
+        return (1);
+    }
+    return (0);
+}
+
+int ft_check_bounds(t_slong **game)
+{
+    if ((*game)->map->col < 1)
+        return (0);
+    if ((*game)->map->exit != 1)
+        return (0);
+    if ((*game)->map->player != 1)
+        return (0);
+    return (1);
+}
+
+int ft_check_map_component(t_slong **game, int rows, int cols)
+{
+    int i;
+    int j;
+
+    i = -1;
+    while (++i < rows)
+    {
+        j = -1;
+        while (++j < cols)
+        {
+            if (i == 0 || i == rows - 1 || j == 0 || j == cols - 1)
+            {
+                if (! ft_check_walls((*game)->map->grid[i][j]))
+                    return(0);
+            }
+            else if (! ft_check_component(game, (*game)->map->grid[i][j]))
+                return (0);
+        }
+    }
+    if (! ft_check_bounds(game))
+        return (0);
+    return (1);
+}
+
+int ft_validate_map(t_slong *game)
+{
+    if (game->map->n_row == game->map->n_colums)
+        return (0);
+    if (! ft_check_map_component(&game, game->map->n_row, game->map->n_colums))
+    {
+        printf("\n==> map component error <==\n");
+        return (0);
+    }
+    // if (! ft_check_valid_map())
+    //     return (0);
+    return (1);
+}
+
+/*
+    ===> end of validating the map
+*/
 void var_dump(char **map, int row, int col)
 {
 
@@ -194,13 +294,12 @@ int main(int ac, char **av)
         return 1;
 
     if (!ft_init_requirement(&game, av[1]))
-    {
-        ft_destroy_game(&game);
-        return 1;
-    }
+        return (printf("==> MAP ERROR <==\n"), ft_destroy_game(&game), 1);
+    if (! ft_validate_map(&game))
+        return (printf("==> MAP ERROR <==\n"),ft_destroy_game(&game), 1);
     var_dump(game.map->grid, game.map->n_row, game.map->n_colums);
     
-    // Other operations if needed
+    // // Other operations if needed
 
     ft_destroy_game(&game);
 

@@ -12,7 +12,7 @@ $(LIBRARY) :
 	$(MAKE) -C libft
 
 $(NAME) : $(OBJ) $(LIBRARY)
-	$(CC) $(CFLAGS)  $^ -o $@
+	$(CC)  $(CFLAGS) -fsanitize=address  $^ -o $@
 
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@

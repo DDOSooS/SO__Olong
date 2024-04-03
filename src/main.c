@@ -183,6 +183,155 @@ int ft_init_requirement(t_slong *game, char *map_file)
     ===> validate map
 */
 
+/*
+    flood fill algorithm
+*/
+
+int ft_getx_component_position(char **map, int n_row, int n_col, char compoenent)
+{
+    int     pos;
+    int     i;
+    int     j;
+
+    i = 0;
+    while (i < n_row)
+    {
+        j = 0;
+        while (j < n_col)
+        {
+            if (map[i][j] == compoenent)
+                return (i);
+            j++;
+        }
+        i++;
+    }
+    return (0);
+}
+
+int ft_gety_component_position(char **map, int n_row, int n_col, char compoenent)
+{
+    int     pos;
+    int     i;
+    int     j;
+
+    i = 0;
+    while (i < n_row)
+    {
+        j = 0;
+        while (j < n_col)
+        {
+            if (map[i][j] == compoenent)
+                return (j);
+            j++;
+        }
+        i++;
+    }
+    return (0);
+}
+
+char **ft_init_map(char **grid, int n_row, int n_col)
+{
+    int     i;
+    int     j;
+
+    i = 0;
+    while (i < n_row)
+    {
+        j = 0;
+        while (j < n_col)
+        {
+            if (grid[i][j] == 'P')
+                grid[i][j] == '0';
+            else if (grid[i][j] == 'E')
+                grid[i][j] = '1';
+            j++;
+        }
+        i++;
+    }
+    return (grid);
+}
+
+
+void dfs(char ***grid, int i, int y, t_map *map)
+{
+    if (i < 0 || i >= map->n_row || y < 0 || y >= map->n_colums)
+        return ;
+    if ((*grid)[i][y] == '1')
+        return ;
+    if ((*grid)[i][y] != 'v')
+        (*grid)[i][y] = 'v';
+    dfs(grid, i, y + 1, map);
+    dfs(grid, i, y - 1, map);
+    dfs(grid, i + 1, y, map);
+    dfs(grid, i - 1, y, map);
+}
+
+void    ft_flood_fill(char ***grid, int i, int y, t_map *map)
+{
+    dfs(grid, i, y + 1, map);
+    dfs(grid, i, y - 1, map);
+    dfs(grid, i + 1, y, map);
+    dfs(grid, i - 1, y, map);
+}
+
+int ft_count_collectible(char **grid, int r, int c)
+{
+    int     i;
+    int     j;
+    int     counter;
+
+    counter = 0;
+    i = 0;
+    while (i < r)
+    {
+        j = 0;
+        while (j < c)
+        {
+            if (grid[i][j] == 'C')
+                counter++;
+            j++;
+        }
+        i++;
+    }
+    return (counter);
+}
+
+int ft_check_map_status(char ***grid,int x, int y, t_map *map)
+{
+    int collectible;
+
+    collectible = ft_count_collectible(*grid, map->n_row, map->n_colums);
+    map->col = ft_count_collectible(map->grid, map->n_row, map->n_colums);
+
+}
+
+int ft_check_valid_path(t_map *map, int n_rows, int n_cols)
+{
+    int x_player;
+    int y_player;
+    int x_exit;
+    int y_exit;
+    char **map1;
+
+    x_player = ft_getx_component_position(map->grid, n_rows, n_cols, 'P');
+    y_player = ft_gety_component_position(map->grid, n_rows, n_cols, 'P');
+    x_exit = ft_gety_component_position(map->grid, n_rows, n_cols, 'E');
+    y_exit = ft_gety_component_position(map->grid, n_rows, n_cols, 'E');
+    map1 = ft_init_map(map->grid, n_rows, n_cols);
+    map1[x_player][y_player] = 'v';
+    ft_flood_fill(&map, x_player, y_player , map);
+    if (! ft_check_map_status(map1, x_exit, y_exit, map));
+        return (0);
+    return (1);
+}
+
+/*
+    end of flood fill algorithm
+*/
+
+
+
+
 int ft_check_walls(char c)
 {
     if (c == '1')
@@ -250,6 +399,7 @@ int ft_check_map_component(t_slong **game, int rows, int cols)
     return (1);
 }
 
+int ft_che
 int ft_validate_map(t_slong *game)
 {
     if (game->map->n_row == game->map->n_colums)
@@ -259,8 +409,10 @@ int ft_validate_map(t_slong *game)
         printf("\n==> map component error <==\n");
         return (0);
     }
-    // if (! ft_check_valid_map())
-    //     return (0);
+    if (! ft_check_component_number(game, game->map->n_row, game->map->n_colums))
+        return (0);
+    if (! ft_check_valid_path(game->map, game->map->n_row, game->map->n_colums))
+        return (0);
     return (1);
 }
 

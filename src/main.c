@@ -253,6 +253,11 @@ void dfs(char ***grid, int i, int y, t_map *map)
         return;
     if ((*grid)[i][y] != 'v')
         (*grid)[i][y] = 'v';
+    else
+        return ;
+    printf("=======================================\n");
+    var_dump(*grid, map->n_row, map->n_colums);
+    printf("======================================\n");
     dfs(grid, i, y + 1, map);
     dfs(grid, i, y - 1, map);
     dfs(grid, i + 1, y, map);
@@ -261,6 +266,9 @@ void dfs(char ***grid, int i, int y, t_map *map)
 
 void ft_flood_fill(char ***grid, int i, int y, t_map *map)
 {
+    printf("========\n");
+    var_dump(*grid, map->n_row, map->n_colums);
+    printf("========\n");
     dfs(grid, i, y + 1, map);
     dfs(grid, i, y - 1, map);
     dfs(grid, i + 1, y, map);
@@ -285,8 +293,9 @@ int ft_count_collectible(char **grid, int r, int c)
 
 int ft_check_map_status(char ***grid, int x, int y, t_map *map) {
     int collectible = ft_count_collectible(*grid, map->n_row, map->n_colums);
+    printf("\n==========>number of collectibles : (%d) <============\n", collectible);
     if (collectible != 0)
-        return 1;
+        return 0;
     if ((*grid)[x][y + 1] == 'v' || (*grid)[x][y - 1] == 'v' || (*grid)[x + 1][y] == 'v' || (*grid)[x - 1][y] == 'v')
         return 1;
     return 0;
@@ -305,8 +314,8 @@ int ft_check_valid_path(t_map *map, int n_rows, int n_cols)
     printf("========\n");
     ft_flood_fill(&map1, x_player, y_player, map);
     if (!ft_check_map_status(&map1, x_exit, y_exit, map))
-        return 1;
-    return 0;
+        return 0;
+    return 1;
 }
 /*
     end of flood fill algorithm
@@ -393,6 +402,7 @@ int ft_validate_map(t_slong *game)
     }
     if (! ft_check_valid_path(game->map, game->map->n_row, game->map->n_colums))
         return (0);
+    printf("\n==> map component is Valid <==\n");
     return (1);
 }
 
@@ -428,7 +438,7 @@ int main(int ac, char **av)
     if (!ft_init_requirement(&game, av[1]))
         return (printf("==> MAP ERROR <==\n"), ft_destroy_game(&game), 1);
     if (! ft_validate_map(&game))
-        return (printf("==> MAP ERROR <==\n"),ft_destroy_game(&game), 1);
+        return (printf("==> MAP ERROR IN VALIDATING <==\n"),ft_destroy_game(&game), 1);
     var_dump(game.map->grid, game.map->n_row, game.map->n_colums);
     
     // // Other operations if needed

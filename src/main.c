@@ -1,6 +1,6 @@
 
 #include "../includes/so_long.h"
-
+#include "../minilibx-linux/mlx.h"
 void var_dump(char **map, int row, int col);
 
 int ft_check_extension(char *str)
@@ -166,6 +166,7 @@ int ft_init_requirement(t_slong *game, char *map_file)
     game->map = ft_new_map();
     if (!game->map)
         return 0;
+    game->cur_moves = 0;
     game->map->n_row = ft_count_rows(fd);
     if (game->map->n_row < 3)
         return (0);
@@ -229,7 +230,8 @@ int ft_gety_component_position(char **map, int n_row, int n_col, char compoenent
     return (0);
 }
 
-char **ft_init_map(char **grid, int n_row, int n_col) {
+char **ft_init_map(char **grid, int n_row, int n_col)
+{
     int i = 0;
     while (i < n_row) {
         int j = 0;
@@ -266,9 +268,9 @@ void dfs(char ***grid, int i, int y, t_map *map)
 
 void ft_flood_fill(char ***grid, int i, int y, t_map *map)
 {
-    printf("========\n");
-    var_dump(*grid, map->n_row, map->n_colums);
-    printf("========\n");
+    // printf("========\n");
+    // var_dump(*grid, map->n_row, map->n_colums);
+    // printf("========\n");
     dfs(grid, i, y + 1, map);
     dfs(grid, i, y - 1, map);
     dfs(grid, i + 1, y, map);
@@ -291,9 +293,10 @@ int ft_count_collectible(char **grid, int r, int c)
     return counter;
 }
 
-int ft_check_map_status(char ***grid, int x, int y, t_map *map) {
+int ft_check_map_status(char ***grid, int x, int y, t_map *map)
+{
     int collectible = ft_count_collectible(*grid, map->n_row, map->n_colums);
-    printf("\n==========>number of collectibles : (%d) <============\n", collectible);
+    // printf("\n==========>number of collectibles : (%d) <============\n", collectible);
     if (collectible != 0)
         return 0;
     if ((*grid)[x][y + 1] == 'v' || (*grid)[x][y - 1] == 'v' || (*grid)[x + 1][y] == 'v' || (*grid)[x - 1][y] == 'v')
@@ -309,9 +312,9 @@ int ft_check_valid_path(t_map *map, int n_rows, int n_cols)
     int y_exit = ft_gety_component_position(map->grid, n_rows, n_cols, 'E');
     char **map1 = ft_init_map(map->grid, n_rows, n_cols);
     map1[x_player][y_player] = 'v';
-    printf("========\n");
-    var_dump(map1, n_rows, n_cols);
-    printf("========\n");
+    // printf("========\n");
+    // var_dump(map1, n_rows, n_cols);
+    // printf("========\n");
     ft_flood_fill(&map1, x_player, y_player, map);
     if (!ft_check_map_status(&map1, x_exit, y_exit, map))
         return 0;
@@ -320,9 +323,6 @@ int ft_check_valid_path(t_map *map, int n_rows, int n_cols)
 /*
     end of flood fill algorithm
 */
-
-
-
 
 int ft_check_walls(char c)
 {
@@ -402,6 +402,7 @@ int ft_validate_map(t_slong *game)
     }
     if (! ft_check_valid_path(game->map, game->map->n_row, game->map->n_colums))
         return (0);
+    game->map->col = ft_count_collectible(game->map->grid, game->map->n_row, game->map->n_colums);
     printf("\n==> map component is Valid <==\n");
     return (1);
 }
@@ -428,6 +429,235 @@ void var_dump(char **map, int row, int col)
         i++;
     }
 }
+
+
+
+
+
+
+
+
+/*
+=============================================================>mlx (code ) and implimentaion<==============================================
+*/
+int ft_gen_tl_image(void **mlx)
+{
+
+    void *img = mlx_xpm_file_to_image(*mlx, "../assets/b.xpm", (int *)18, (int *)18);
+    if (! img)
+    {
+        printf("===> ERROR TOP LEFT <===");
+        return (0);
+    }
+    return (1);
+}
+
+int ft_gen_tr_image(void **mlx, int width, int height)
+{
+    if (! mlx_xpm_file_to_image(*mlx, "../assets/tr.xpm", &width, &height))
+        return (0);
+    return (1);
+}
+
+
+int ft_gen_top_image(void **mlx, int width, int height)
+{
+    if (! mlx_xpm_file_to_image(*mlx, "../assets/t.xpm", &width, &height))
+        return (0);
+    return (1);
+}
+
+int ft_gen_bl_image(void **mlx, int width, int height)
+{
+    if (! mlx_xpm_file_to_image(*mlx, "../assets/bl.xpm", &width, &height))
+        return (0);
+    return (1);
+}
+
+int ft_gen_br_image(void **mlx, int width, int height)
+{
+    if (! mlx_xpm_file_to_image(*mlx, "../assets/br.xpm", &width, &height))
+        return (0);
+    return (1);
+}
+
+int ft_gen_bottom_image(void **mlx, int width, int height)
+{
+    if (! mlx_xpm_file_to_image(*mlx, "../assets/bottom.xpm", &width, &height))
+        return (0);
+    return (1);
+}
+
+int ft_gen_player_image(void **mlx, int width, int height)
+{
+    if (! mlx_xpm_file_to_image(*mlx, "../assets/p1.xpm", &width, &height))
+        return (0);
+    return (1);
+}
+int ft_gen_exit_image(void **mlx, int width, int height)
+{
+    if (! mlx_xpm_file_to_image(*mlx, "../assets/exit.xpm", &width, &height))
+        return (0);
+    return (1);
+}
+
+int ft_gen_wall_image(void **mlx, int width, int height)
+{
+    if (! mlx_xpm_file_to_image(*mlx, "../assets/0.xpm", &width, &height))
+        return (0);
+    return (1);
+}
+
+int ft_gen_collectible_image(void **mlx, int width, int height)
+{
+    if (! mlx_xpm_file_to_image(*mlx, "../assets/key.xpm", &width, &height))
+        return (0);
+    return (1);
+}
+
+int ft_gen_right_image(void **mlx, int width, int height)
+{
+    if (! mlx_xpm_file_to_image(*mlx, "../assets/r.xpm", &width, &height))
+        return (0);
+    return (1);
+}
+
+int ft_gen_left_image(void **mlx, int width, int height)
+{
+    if (! mlx_xpm_file_to_image(*mlx, "../assets/l.xpm", &width, &height))
+        return (0);
+    return (1);
+}
+
+int ft_gen_enemy_image(void **mlx, int width, int height)
+{
+    if (! mlx_xpm_file_to_image(*mlx, "../assets/e1.xpm", &width, &height))
+        return (0);
+    return (1);
+}
+
+int ft_set_image_helper(void **mlx, int id, int i, int j)
+{
+    if (id == 11)
+        ft_gen_wall_image(*mlx, i * 18, j *18);
+    return (ft_gen_enemy_image(*mlx, i * 18, j *18));
+}
+
+int ft_set_image(void **mlx, int id, int i, int j)
+{
+    if (id == 0)
+        return (ft_gen_tl_image(*mlx));
+    if (id == 1)
+        return (ft_gen_tr_image(*mlx,  i * 18, j *18));
+    if (id == 2)
+        return (ft_gen_top_image(*mlx, i * 18, j *18));
+    if (id == 3)
+        return (ft_gen_bl_image(*mlx, i * 18, j *18));
+    if (id == 4)
+        return (ft_gen_br_image(*mlx, i * 18, j *18));
+    if (id == 5)
+        return (ft_gen_bottom_image(*mlx,  i * 18, j *18));
+    if (id == 6)
+        return (ft_gen_left_image(*mlx, i * 18, j *18));
+    if (id == 7)
+        return (ft_gen_right_image(*mlx, i * 18, j *18));
+    if (id == 8)
+        return (ft_gen_player_image(*mlx, i *18, j *18));
+    if (id == 9)
+        return (ft_gen_collectible_image(*mlx, i * 18, j *18));
+    if (id == 10)
+        return (ft_gen_exit_image(*mlx, i * 18, j *18));
+    return (ft_set_image_helper(mlx, id , i, j));
+}
+
+
+int ft_get_image_id_helper(char compenent)
+{
+    if (compenent == '1')
+        return (11);
+    return (12);
+}
+int ft_get_image_id(char component, int i, int j, t_map *map)
+{
+    if (i == 0 && j == 0)
+        return (0);
+    else if (i == 0 && j == map->n_colums - 1)
+        return (1);
+    else if ( i == 0)
+        return (2);
+    else if (i == map->n_row -1 && j == 0)
+        return (3);
+    else if (i == map->n_row -1 && j == map->n_colums - 1)
+        return (4);
+    else if ( i == map->n_row -1)
+        return (5);
+    else if (j == 0)
+        return (6);
+    else if (j == map->n_colums - 1)
+        return (7);
+    else if (component == 'P')
+        return (8);
+    else if (component == 'C')
+        return (9);
+    else if (component == 'E')
+        return (10);
+    return (ft_get_image_id_helper(component));
+}
+
+int ft_gen_window(t_slong *game, void **mlx, void **win)
+{
+    int i;
+    int j;
+    int flag;
+
+    i = 0;
+    while (i < game->map->n_row)
+    {
+        j = 0;
+        while (j < game->map->n_colums)
+        {
+            flag = ft_get_image_id(game->map->grid[i][j], i , j , game->map);   
+            if (! ft_set_image(mlx, flag , i , j))
+            {
+                printf("errorrrrrrrrr (%d)(%d)", i,j);
+                return (0);
+            }
+            mlx_put_image_to_window(*mlx , *win,NULL, i * 18, j *18);
+            j++;
+        }
+        i++;
+    }
+    return (1);
+}
+
+int ft_init_game(t_slong *game)
+{
+    int with;
+    int height;
+    void    *mlx;
+    void    *win;
+
+    with = game->map->n_colums * 18;
+    height = game->map->n_row * 18;
+    mlx = mlx_init();
+    win = mlx_new_window(mlx, with, height, "So_oLong");
+	if (! ft_gen_window(game, &mlx, &win))
+    {
+        printf("\n====>errrrrrrrrrrrrrrrrrrrrrrrrrrror<==\n");
+        return (0);
+    }
+    mlx_loop(mlx);
+    return (1);
+}
+
+
+
+/*
+============================================================>end of mlx implimention<=====================================================
+*/
+
+
+
 int main(int ac, char **av)
 {
     t_slong game;
@@ -439,11 +669,10 @@ int main(int ac, char **av)
         return (printf("==> MAP ERROR <==\n"), ft_destroy_game(&game), 1);
     if (! ft_validate_map(&game))
         return (printf("==> MAP ERROR IN VALIDATING <==\n"),ft_destroy_game(&game), 1);
-    var_dump(game.map->grid, game.map->n_row, game.map->n_colums);
-    
-    // // Other operations if needed
-
-    ft_destroy_game(&game);
-
+    if (!ft_init_game(&game))
+        ft_destroy_game(&game);
     return 0;
 }
+    // var_dump(game.map->grid, game.map->n_row, game.map->n_colums);
+    
+    // // // Other operations if needed

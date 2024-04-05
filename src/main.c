@@ -18,7 +18,8 @@ int ft_count_rows(int fd)
     int n_row = 0;
     char *line;
 
-    while ((line = get_next_line(fd)) != NULL) {
+    while ((line = get_next_line(fd)) != NULL)
+    {
         free(line);
         n_row++;
     }
@@ -454,7 +455,7 @@ int ft_gen_tl_image(void **mlx)
 
 int ft_gen_tr_image(void **mlx, int width, int height)
 {
-    if (! mlx_xpm_file_to_image(*mlx, "../assets/tr.xpm", &width, &height))
+    if (! mlx_xpm_file_to_image(*mlx, "./assets/tr.xpm", &width, &height))
         return (0);
     return (1);
 }
@@ -462,41 +463,39 @@ int ft_gen_tr_image(void **mlx, int width, int height)
 
 int ft_gen_top_image(void **mlx, int width, int height)
 {
-    if (! mlx_xpm_file_to_image(*mlx, "../assets/t.xpm", &width, &height))
+    if (! mlx_xpm_file_to_image(*mlx, "./assets/t.xpm", &width, &height))
         return (0);
     return (1);
 }
 
 int ft_gen_bl_image(void **mlx, int width, int height)
 {
-    if (! mlx_xpm_file_to_image(*mlx, "../assets/bl.xpm", &width, &height))
+    if (! mlx_xpm_file_to_image(*mlx, "./assets/bl.xpm", &width, &height))
         return (0);
     return (1);
 }
 
 int ft_gen_br_image(void **mlx, int width, int height)
 {
-    if (! mlx_xpm_file_to_image(*mlx, "../assets/br.xpm", &width, &height))
+    if (! mlx_xpm_file_to_image(*mlx, "./assets/br.xpm", &width, &height))
         return (0);
     return (1);
 }
 
-int ft_gen_bottom_image(void **mlx, int width, int height)
+void *ft_gen_bottom_image(void **mlx, int width, int height)
 {
-    if (! mlx_xpm_file_to_image(*mlx, "../assets/bottom.xpm", &width, &height))
-        return (0);
-    return (1);
+    return (mlx_xpm_file_to_image(*mlx, "./assets/bottom.xpm", &width, &height));
 }
 
 int ft_gen_player_image(void **mlx, int width, int height)
 {
-    if (! mlx_xpm_file_to_image(*mlx, "../assets/p1.xpm", &width, &height))
+    if (! mlx_xpm_file_to_image(*mlx, "./assets/p1.xpm", &width, &height))
         return (0);
     return (1);
 }
 int ft_gen_exit_image(void **mlx, int width, int height)
 {
-    if (! mlx_xpm_file_to_image(*mlx, "../assets/exit.xpm", &width, &height))
+    if (! mlx_xpm_file_to_image(*mlx, "./assets/exit.xpm", &width, &height))
         return (0);
     return (1);
 }
@@ -510,14 +509,14 @@ int ft_gen_wall_image(void **mlx, int width, int height)
 
 int ft_gen_collectible_image(void **mlx, int width, int height)
 {
-    if (! mlx_xpm_file_to_image(*mlx, "../assets/key.xpm", &width, &height))
+    if (! mlx_xpm_file_to_image(*mlx, "./assets/key.xpm", &width, &height))
         return (0);
     return (1);
 }
 
 int ft_gen_right_image(void **mlx, int width, int height)
 {
-    if (! mlx_xpm_file_to_image(*mlx, "../assets/r.xpm", &width, &height))
+    if (! mlx_xpm_file_to_image(*mlx, "./assets/r.xpm", &width, &height))
         return (0);
     return (1);
 }
@@ -531,7 +530,7 @@ int ft_gen_left_image(void **mlx, int width, int height)
 
 int ft_gen_enemy_image(void **mlx, int width, int height)
 {
-    if (! mlx_xpm_file_to_image(*mlx, "../assets/e1.xpm", &width, &height))
+    if (! mlx_xpm_file_to_image(*mlx, "./assets/e1.xpm", &width, &height))
         return (0);
     return (1);
 }
@@ -543,33 +542,6 @@ int ft_set_image_helper(void **mlx, int id, int i, int j)
     return (ft_gen_enemy_image(*mlx, i * 18, j *18));
 }
 
-int ft_set_image(void **mlx, int id, int i, int j)
-{
-    if (id == 0)
-        return (ft_gen_tl_image(*mlx));
-    if (id == 1)
-        return (ft_gen_tr_image(*mlx,  i * 18, j *18));
-    if (id == 2)
-        return (ft_gen_top_image(*mlx, i * 18, j *18));
-    if (id == 3)
-        return (ft_gen_bl_image(*mlx, i * 18, j *18));
-    if (id == 4)
-        return (ft_gen_br_image(*mlx, i * 18, j *18));
-    if (id == 5)
-        return (ft_gen_bottom_image(*mlx,  i * 18, j *18));
-    if (id == 6)
-        return (ft_gen_left_image(*mlx, i * 18, j *18));
-    if (id == 7)
-        return (ft_gen_right_image(*mlx, i * 18, j *18));
-    if (id == 8)
-        return (ft_gen_player_image(*mlx, i *18, j *18));
-    if (id == 9)
-        return (ft_gen_collectible_image(*mlx, i * 18, j *18));
-    if (id == 10)
-        return (ft_gen_exit_image(*mlx, i * 18, j *18));
-    return (ft_set_image_helper(mlx, id , i, j));
-}
-
 
 int ft_get_image_id_helper(char compenent)
 {
@@ -577,6 +549,7 @@ int ft_get_image_id_helper(char compenent)
         return (11);
     return (12);
 }
+
 int ft_get_image_id(char component, int i, int j, t_map *map)
 {
     if (i == 0 && j == 0)
@@ -604,11 +577,26 @@ int ft_get_image_id(char component, int i, int j, t_map *map)
     return (ft_get_image_id_helper(component));
 }
 
-int ft_gen_window(t_slong *game, void **mlx, void **win)
+
+
+/*
+    i need to specify the compenent that well have any animation 
+*/
+int ft_setup_image(t_slong *game, int i, int j, int image_id)
 {
-    int i;
-    int j;
-    int flag;
+    void *img;
+    char *str;
+
+    str = ft_get_image_name(image_id);
+    img = mlx_xpm_file_to_image(game->mlx, str, (int *)18, (int *)18);
+    return (1);
+}
+
+int ft_gen_window(t_slong *game)
+{
+    int     i;
+    int     j;
+    int     flag;
 
     i = 0;
     while (i < game->map->n_row)
@@ -617,12 +605,8 @@ int ft_gen_window(t_slong *game, void **mlx, void **win)
         while (j < game->map->n_colums)
         {
             flag = ft_get_image_id(game->map->grid[i][j], i , j , game->map);   
-            if (! ft_set_image(mlx, flag , i , j))
-            {
-                printf("errorrrrrrrrr (%d)(%d)", i,j);
+            if (! ft_setup_image(game, i, j, flag))
                 return (0);
-            }
-            mlx_put_image_to_window(*mlx , *win,NULL, i * 18, j *18);
             j++;
         }
         i++;
@@ -634,19 +618,17 @@ int ft_init_game(t_slong *game)
 {
     int with;
     int height;
-    void    *mlx;
-    void    *win;
 
     with = game->map->n_colums * 18;
     height = game->map->n_row * 18;
-    mlx = mlx_init();
-    win = mlx_new_window(mlx, with, height, "So_oLong");
-	if (! ft_gen_window(game, &mlx, &win))
+    game->mlx = mlx_init();
+    game->win = mlx_new_window(game->mlx, with, height, "So_oLong");
+	if (! ft_gen_window(game))
     {
         printf("\n====>errrrrrrrrrrrrrrrrrrrrrrrrrrror<==\n");
         return (0);
     }
-    mlx_loop(mlx);
+    mlx_loop(game->mlx);
     return (1);
 }
 

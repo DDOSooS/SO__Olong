@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/01 10:52:21 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/02 10:04:14 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/05 18:37:08 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,15 +38,23 @@ char	*get_next_line(int fd);
 
 typedef struct enemy
 {
-    int             pos;
+    int             x;
+    int             y;
     int             direction;
     struct enemy    *next;
 }   t_enemy;
 
+typedef struct player
+{
+    int             x;
+    int             y;
+    int             direction;
+    struct player   *next;
+} t_player;
 
 typedef struct map
 {
-    char         **grid;
+    char        **grid;
     int         player;
     int         col;
     int         exit;
@@ -57,8 +65,11 @@ typedef struct map
 
 typedef struct  so_long
 {
-    t_map	*map;
-    int		cur_moves;
+    void        *mlx;
+    void        *win;
+    t_map	    *map;
+    int		    cur_moves;
+    t_player    *player;
     // t_enemy *enemy;
 }   t_slong ;
 

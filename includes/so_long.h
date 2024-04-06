@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/01 10:52:21 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/05 18:37:08 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/06 01:41:44 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ typedef struct player
     int             x;
     int             y;
     int             direction;
+    char            *img[2];
     struct player   *next;
 } t_player;
 
@@ -67,8 +68,8 @@ typedef struct  so_long
 {
     void        *mlx;
     void        *win;
-    t_map	    *map;
     int		    cur_moves;
+    t_map	    *map;
     t_player    *player;
     // t_enemy *enemy;
 }   t_slong ;

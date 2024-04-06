@@ -441,106 +441,8 @@ void var_dump(char **map, int row, int col)
 /*
 =============================================================>mlx (code ) and implimentaion<==============================================
 */
-int ft_gen_tl_image(void **mlx)
-{
-
-    void *img = mlx_xpm_file_to_image(*mlx, "../assets/b.xpm", (int *)18, (int *)18);
-    if (! img)
-    {
-        printf("===> ERROR TOP LEFT <===");
-        return (0);
-    }
-    return (1);
-}
-
-int ft_gen_tr_image(void **mlx, int width, int height)
-{
-    if (! mlx_xpm_file_to_image(*mlx, "./assets/tr.xpm", &width, &height))
-        return (0);
-    return (1);
-}
 
 
-int ft_gen_top_image(void **mlx, int width, int height)
-{
-    if (! mlx_xpm_file_to_image(*mlx, "./assets/t.xpm", &width, &height))
-        return (0);
-    return (1);
-}
-
-int ft_gen_bl_image(void **mlx, int width, int height)
-{
-    if (! mlx_xpm_file_to_image(*mlx, "./assets/bl.xpm", &width, &height))
-        return (0);
-    return (1);
-}
-
-int ft_gen_br_image(void **mlx, int width, int height)
-{
-    if (! mlx_xpm_file_to_image(*mlx, "./assets/br.xpm", &width, &height))
-        return (0);
-    return (1);
-}
-
-void *ft_gen_bottom_image(void **mlx, int width, int height)
-{
-    return (mlx_xpm_file_to_image(*mlx, "./assets/bottom.xpm", &width, &height));
-}
-
-int ft_gen_player_image(void **mlx, int width, int height)
-{
-    if (! mlx_xpm_file_to_image(*mlx, "./assets/p1.xpm", &width, &height))
-        return (0);
-    return (1);
-}
-int ft_gen_exit_image(void **mlx, int width, int height)
-{
-    if (! mlx_xpm_file_to_image(*mlx, "./assets/exit.xpm", &width, &height))
-        return (0);
-    return (1);
-}
-
-int ft_gen_wall_image(void **mlx, int width, int height)
-{
-    if (! mlx_xpm_file_to_image(*mlx, "../assets/0.xpm", &width, &height))
-        return (0);
-    return (1);
-}
-
-int ft_gen_collectible_image(void **mlx, int width, int height)
-{
-    if (! mlx_xpm_file_to_image(*mlx, "./assets/key.xpm", &width, &height))
-        return (0);
-    return (1);
-}
-
-int ft_gen_right_image(void **mlx, int width, int height)
-{
-    if (! mlx_xpm_file_to_image(*mlx, "./assets/r.xpm", &width, &height))
-        return (0);
-    return (1);
-}
-
-int ft_gen_left_image(void **mlx, int width, int height)
-{
-    if (! mlx_xpm_file_to_image(*mlx, "../assets/l.xpm", &width, &height))
-        return (0);
-    return (1);
-}
-
-int ft_gen_enemy_image(void **mlx, int width, int height)
-{
-    if (! mlx_xpm_file_to_image(*mlx, "./assets/e1.xpm", &width, &height))
-        return (0);
-    return (1);
-}
-
-int ft_set_image_helper(void **mlx, int id, int i, int j)
-{
-    if (id == 11)
-        ft_gen_wall_image(*mlx, i * 18, j *18);
-    return (ft_gen_enemy_image(*mlx, i * 18, j *18));
-}
 
 
 int ft_get_image_id_helper(char compenent)
@@ -577,36 +479,112 @@ int ft_get_image_id(char component, int i, int j, t_map *map)
     return (ft_get_image_id_helper(component));
 }
 
+char *ft_get_absolute_component(int id)
+{
+    if (id == 0)
+        return ("imgs/tl.xpm");
+    else if (id == 1)
+        return ("imgs/tr.xpm");
+    else if (id == 2)
+        return ("imgs/t.xpm");
+    else if (id == 3)
+        return ("imgs/bl.xpm");
+    else if (id == 4)
+        return ("imgs/br.xpm");
+    else if (id == 5)
+        return ("imgs/b.xpm");
+    else if (id == 6)
+        return ("imgs/l.xpm");
+    else if (id == 7)
+        return ("imgs/r.xpm");
+    return ("imgs/0.xpm");
+}
 
+
+char *ft_get_image_name(t_slong game, int img_id)
+{
+    char *img_name;
+
+    if ((img_id >= 0 && img_id <= 7) || img_id == 11)
+        img_name = ft_get_absolute_component(img_id);
+    else if (img_id == 8)
+    {
+        img_name =  game.player->img[0];
+    }
+    else if (img_id == 9)
+    {
+        img_name = "imgs/key.xpm";
+    }
+    else if (img_id == 10)
+    {
+        img_name = "imgs/exit.xpm";
+    }
+    return (img_name);
+}
 
 /*
     i need to specify the compenent that well have any animation 
 */
-int ft_setup_image(t_slong *game, int i, int j, int image_id)
-{
-    void *img;
-    char *str;
 
-    str = ft_get_image_name(image_id);
-    img = mlx_xpm_file_to_image(game->mlx, str, (int *)18, (int *)18);
+char *ft_strcpy(char *s1, char *s2)
+{
+    int i;
+
+    i = 0;
+    while (s1[i]!= '\0')
+    {
+        s1[i] = s2[i];
+        i++;
+    }
+    s1[i] = '\0';
+    return (s1);
+}
+
+int ft_setup_image(t_slong game, int i, int j, int image_id)
+{
+    void    *img;
+    char    *img_path;
+    int     fd;
+
+    game.player = malloc(sizeof(t_player));
+    game.player->img[0] =  malloc(ft_strlen("img/p1.xpm") +1);
+    game.player->img[1] =  malloc(ft_strlen("img/p2.xpm") +1);
+    ft_strcpy( game.player->img[0],"imgs/p1.xpm");
+    ft_strcpy( game.player->img[1],"imgs/p2.xpm");
+
+    img_path = ft_get_image_name(game, image_id);
+    printf("\n====>image name: (%s)<===\n", img_path);
+    fd = open(img_path, O_RDONLY);
+    if (fd == -1)
+    {
+        perror("open");
+        return (0);
+    }
+    img = mlx_xpm_file_to_image(game.mlx, img_path, (int *)18, (int *)18);
+    if (!img)
+        return (0);
+    mlx_put_image_to_window(game.mlx,game.win , img, i * 18, j *18);
     return (1);
 }
 
-int ft_gen_window(t_slong *game)
+int ft_gen_window(t_slong game)
 {
     int     i;
     int     j;
     int     flag;
 
     i = 0;
-    while (i < game->map->n_row)
+    while (i < game.map->n_row)
     {
         j = 0;
-        while (j < game->map->n_colums)
+        while (j < game.map->n_colums)
         {
-            flag = ft_get_image_id(game->map->grid[i][j], i , j , game->map);   
+            flag = ft_get_image_id(game.map->grid[i][j], i , j , game.map);   
             if (! ft_setup_image(game, i, j, flag))
+            {
+                printf("\n==>error here (%d)(%d)<==\n", i, j);
                 return (0);
+            }
             j++;
         }
         i++;
@@ -614,21 +592,21 @@ int ft_gen_window(t_slong *game)
     return (1);
 }
 
-int ft_init_game(t_slong *game)
+int ft_init_game(t_slong game)
 {
     int with;
     int height;
 
-    with = game->map->n_colums * 18;
-    height = game->map->n_row * 18;
-    game->mlx = mlx_init();
-    game->win = mlx_new_window(game->mlx, with, height, "So_oLong");
+    with = game.map->n_colums * 18;
+    height = game.map->n_row * 18;
+    game.mlx = mlx_init();
+    game.win = mlx_new_window(game.mlx, with, height, "So_oLong");
 	if (! ft_gen_window(game))
     {
         printf("\n====>errrrrrrrrrrrrrrrrrrrrrrrrrrror<==\n");
         return (0);
     }
-    mlx_loop(game->mlx);
+    mlx_loop(game.mlx);
     return (1);
 }
 
@@ -651,7 +629,7 @@ int main(int ac, char **av)
         return (printf("==> MAP ERROR <==\n"), ft_destroy_game(&game), 1);
     if (! ft_validate_map(&game))
         return (printf("==> MAP ERROR IN VALIDATING <==\n"),ft_destroy_game(&game), 1);
-    if (!ft_init_game(&game))
+    if (!ft_init_game(game))
         ft_destroy_game(&game);
     return 0;
 }

@@ -438,13 +438,6 @@ void var_dump(char **map, int row, int col)
 
 
 
-/*
-=============================================================>mlx (code ) and implimentaion<==============================================
-*/
-
-
-
-
 int ft_get_image_id_helper(char compenent)
 {
     if (compenent == '1')
@@ -567,7 +560,7 @@ int ft_setup_image(t_slong game, int i, int j, int image_id)
     return (1);
 }
 
-int ft_gen_window(t_slong game)
+int ft_gen_wwindow(t_slong game)
 {
     int     i;
     int     j;
@@ -591,6 +584,18 @@ int ft_gen_window(t_slong game)
     }
     return (1);
 }
+/*
+=============================================================>mlx (code ) and implimentaion<==============================================
+*/
+
+int ft_gen_window(t_slong game)
+{
+    
+    return (1);
+}
+
+
+
 
 int ft_init_game(t_slong game)
 {

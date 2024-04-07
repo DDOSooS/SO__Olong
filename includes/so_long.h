@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/01 10:52:21 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/06 01:41:44 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/07 00:21:50 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ typedef struct player
 {
     int             x;
     int             y;
-    int             direction;
+    int             flag;
     char            *img[2];
     struct player   *next;
 } t_player;

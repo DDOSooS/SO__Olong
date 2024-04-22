@@ -392,7 +392,7 @@ int ft_check_map_component(t_slong **game, int rows, int cols)
     return (1);
 }
 
-int ft_validate_map(t_slong *game)
+int ft_validate_map(t_slong *game, char *map_file)
 {
     if (game->map->n_row == game->map->n_colums)
         return (0);
@@ -405,6 +405,12 @@ int ft_validate_map(t_slong *game)
         return (0);
     game->map->col = ft_count_collectible(game->map->grid, game->map->n_row, game->map->n_colums);
     printf("\n==> map component is Valid <==\n");
+    ft_free_grid(game->map->grid, game->map->n_row);
+    game->map->grid = malloc(sizeof(char *) * game->map->n_row);
+    if (!game->map->grid)
+        return (0);
+    if (!ft_gen_map(game->map, map_file))
+        return (0);
     return (1);
 }
 
@@ -431,16 +437,9 @@ void var_dump(char **map, int row, int col)
     }
 }
 
-
-
-
-
-
-
-
 int ft_get_image_id_helper(char compenent)
 {
-    if (compenent == '1')
+    if (compenent == '0')
         return (11);
     return (12);
 }
@@ -472,6 +471,12 @@ int ft_get_image_id(char component, int i, int j, t_map *map)
     return (ft_get_image_id_helper(component));
 }
 
+
+
+
+
+
+
 char *ft_get_absolute_component(int id)
 {
     if (id == 0)
@@ -490,7 +495,9 @@ char *ft_get_absolute_component(int id)
         return ("imgs/l.xpm");
     else if (id == 7)
         return ("imgs/r.xpm");
-    return ("imgs/0.xpm");
+    else if (id == 11)
+        return ("imgs/00.xpm");
+    return ("imgs/w1.xpm");
 }
 
 
@@ -498,7 +505,8 @@ char *ft_get_image_name(t_slong game, int img_id)
 {
     char *img_name;
 
-    if ((img_id >= 0 && img_id <= 7) || img_id == 11)
+    img_name = NULL;
+    if ((img_id >= 0 && img_id <= 7) || img_id == 11 || img_id == 12)
         img_name = ft_get_absolute_component(img_id);
     else if (img_id == 8)
     {
@@ -519,80 +527,73 @@ char *ft_get_image_name(t_slong game, int img_id)
     i need to specify the compenent that well have any animation 
 */
 
-char *ft_strcpy(char *s1, char *s2)
+char *ft_strcpy(char *s1, const char *s2)
 {
-    int i;
-
-    i = 0;
-    while (s1[i]!= '\0')
+    int i = 0;
+    while (s2[i])
     {
         s1[i] = s2[i];
         i++;
     }
     s1[i] = '\0';
-    return (s1);
+    return s1;
 }
 
-int ft_setup_image(t_slong game, int i, int j, int image_id)
+char *ft_get_img_path(t_slong *game, int image_id)
 {
-    void    *img;
-    char    *img_path;
-    int     fd;
-
-    game.player = malloc(sizeof(t_player));
-    game.player->img[0] =  malloc(ft_strlen("img/p1.xpm") +1);
-    game.player->img[1] =  malloc(ft_strlen("img/p2.xpm") +1);
-    ft_strcpy( game.player->img[0],"imgs/p1.xpm");
-    ft_strcpy( game.player->img[1],"imgs/p2.xpm");
-
-    img_path = ft_get_image_name(game, image_id);
-    printf("\n====>image name: (%s)<===\n", img_path);
-    fd = open(img_path, O_RDONLY);
-    if (fd == -1)
-    {
-        perror("open");
-        return (0);
-    }
-    img = mlx_xpm_file_to_image(game.mlx, img_path, (int *)18, (int *)18);
-    if (!img)
-        return (0);
-    mlx_put_image_to_window(game.mlx,game.win , img, i * 18, j *18);
-    return (1);
+    char *img_path;
+    // Allocate memory for game->player only if it's NULL
+    game->player = malloc(sizeof(t_player));
+    if (!game->player) return NULL;
+    game->player->img[0] = malloc(strlen("imgs/p1.xpm") + 1);
+    game->player->img[1] = malloc(strlen("imgs/p2.xpm") + 1);
+    if (!game->player->img[0] || !game->player->img[1]) return NULL;
+    ft_strcpy(game->player->img[0], "imgs/p1.xpm");
+    ft_strcpy(game->player->img[1], "imgs/p2.xpm");
+    img_path = ft_get_image_name(*game, image_id);
+    if (!img_path)
+        return (NULL);
+    return img_path;
 }
 
-int ft_gen_wwindow(t_slong game)
+int ft_gen_window(t_slong *game)
 {
-    int     i;
-    int     j;
-    int     flag;
-
-    i = 0;
-    while (i < game.map->n_row)
+    int i, j, flag;
+    void *img;
+    char *path;
+    i = -1;
+    while (++i < game->map->n_row)
     {
         j = 0;
-        while (j < game.map->n_colums)
+        while (j < game->map->n_colums)
         {
-            flag = ft_get_image_id(game.map->grid[i][j], i , j , game.map);   
-            if (! ft_setup_image(game, i, j, flag))
-            {
-                printf("\n==>error here (%d)(%d)<==\n", i, j);
-                return (0);
+            flag = ft_get_image_id(game->map->grid[i][j], i , j , game->map); 
+            printf("\nimg_id==>(%d)  i\\j (%d\\%d)\n", flag, i ,j);
+            path = ft_get_img_path(game, flag);
+            printf("\n====(%s) | (%c)\n", path, game->map->grid[i][j]);
+            // Check if path is NULL before using it
+            if (!path) return 0;
+            img = mlx_xpm_file_to_image(game->mlx, path, &(int){18}, &(int){18});
+            if (img == NULL) {
+                printf("\nerror in image setting (%s)\n", path);
+                return 0;
             }
+            mlx_put_image_to_window(game->mlx, game->win, img, j * 18, i * 18);
             j++;
         }
-        i++;
     }
-    return (1);
+    return 1;
 }
+
 /*
 =============================================================>mlx (code ) and implimentaion<==============================================
 */
 
-int ft_gen_window(t_slong game)
-{
+// int ft_gen_window(t_slong *game)
+// {
     
-    return (1);
-}
+//     return (1);
+// }
 
 
 
@@ -602,11 +603,13 @@ int ft_init_game(t_slong game)
     int with;
     int height;
 
+    printf("\n number of col : (%d) number of rows : (%d)\n", game.map->n_colums, game.map->n_row);
+
     with = game.map->n_colums * 18;
     height = game.map->n_row * 18;
     game.mlx = mlx_init();
     game.win = mlx_new_window(game.mlx, with, height, "So_oLong");
-	if (! ft_gen_window(game))
+	if (! ft_gen_window(&game))
     {
         printf("\n====>errrrrrrrrrrrrrrrrrrrrrrrrrrror<==\n");
         return (0);
@@ -632,7 +635,7 @@ int main(int ac, char **av)
 
     if (!ft_init_requirement(&game, av[1]))
         return (printf("==> MAP ERROR <==\n"), ft_destroy_game(&game), 1);
-    if (! ft_validate_map(&game))
+    if (! ft_validate_map(&game, av[1]))
         return (printf("==> MAP ERROR IN VALIDATING <==\n"),ft_destroy_game(&game), 1);
     if (!ft_init_game(game))
         ft_destroy_game(&game);

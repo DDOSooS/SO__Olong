@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   so_long.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aghergho < aghergho@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/01 10:52:21 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/07 00:21:50 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/22 09:43:37 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ typedef struct enemy
     int             x;
     int             y;
     int             direction;
+    char            *img[3];
     struct enemy    *next;
 }   t_enemy;
 

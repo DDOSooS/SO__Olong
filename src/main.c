@@ -47,14 +47,24 @@ void ft_free_grid(char **grid, int n_row)
 
 void ft_destroy_game(t_slong *game)
 {
-    if (!game->map)
-        return;
     if (game->map->grid)
         ft_free_grid(game->map->grid, game->map->n_row);
+    if (game->player != NULL)
+    {
+        free(game->player->img[0]);
+        free(game->player->img[1]);
+    }
+    free(game->player);
     free(game->map);
-}
+    if (game->win)
+    {
+        mlx_destroy_window(game->mlx, game->win);
+        mlx_destroy_display(game->mlx);
+        free(game->mlx); 
+    }
+} 
 
-int *ft_gen_row(char *line)
+int *ft_gen_row(char *line) 
 {
     int *row;
     int i;
@@ -258,9 +268,7 @@ void dfs(char ***grid, int i, int y, t_map *map)
         (*grid)[i][y] = 'v';
     else
         return ;
-    printf("=======================================\n");
-    var_dump(*grid, map->n_row, map->n_colums);
-    printf("======================================\n");
+
     dfs(grid, i, y + 1, map);
     dfs(grid, i, y - 1, map);
     dfs(grid, i + 1, y, map);
@@ -397,10 +405,8 @@ int ft_validate_map(t_slong *game, char *map_file)
     if (game->map->n_row == game->map->n_colums)
         return (0);
     if (! ft_check_map_component(&game, game->map->n_row, game->map->n_colums))
-    {
-        printf("\n==> map component error <==\n");
         return (0);
-    }
+        //  printf("\n==> map component error <==\n"),
     if (! ft_check_valid_path(game->map, game->map->n_row, game->map->n_colums))
         return (0);
     game->map->col = ft_count_collectible(game->map->grid, game->map->n_row, game->map->n_colums);
@@ -411,6 +417,7 @@ int ft_validate_map(t_slong *game, char *map_file)
         return (0);
     if (!ft_gen_map(game->map, map_file))
         return (0);
+    game->map->col = ft_count_collectible(game->map->grid, game->map->n_row, game->map->n_colums);
     return (1);
 }
 
@@ -441,7 +448,8 @@ int ft_get_image_id_helper(char compenent)
 {
     if (compenent == '0')
         return (11);
-    return (12);
+    return (12);    // printf("\n====> left || COL[%d]<====\n", game->map->col);
+
 }
 
 int ft_get_image_id(char component, int i, int j, t_map *map)
@@ -470,12 +478,6 @@ int ft_get_image_id(char component, int i, int j, t_map *map)
         return (10);
     return (ft_get_image_id_helper(component));
 }
-
-
-
-
-
-
 
 char *ft_get_absolute_component(int id)
 {
@@ -539,47 +541,57 @@ char *ft_strcpy(char *s1, const char *s2)
     return s1;
 }
 
+t_player *ft_gen_player(char **grid, int n_rows, int n_col)
+{
+    t_player *player;
+
+    player = malloc(sizeof(t_player));
+    if (!player)
+        return NULL;
+    player->img[0] = malloc(strlen("imgs/p1.xpm") + 1);
+    player->img[1] = malloc(strlen("imgs/p2.xpm") + 1);
+    if (!player->img[0] || !player->img[1]) return NULL;
+    ft_strcpy(player->img[0], "imgs/p1.xpm");
+    ft_strcpy(player->img[1], "imgs/p2.xpm");
+    player->x = ft_getx_component_position(grid,n_rows, n_col,'P');
+    player->y = ft_gety_component_position(grid,n_rows, n_col,'P');
+    player->flag = 0;
+    return (player);
+}
 char *ft_get_img_path(t_slong *game, int image_id)
 {
     char *img_path;
-    // Allocate memory for game->player only if it's NULL
-    game->player = malloc(sizeof(t_player));
-    if (!game->player) return NULL;
-    game->player->img[0] = malloc(strlen("imgs/p1.xpm") + 1);
-    game->player->img[1] = malloc(strlen("imgs/p2.xpm") + 1);
-    if (!game->player->img[0] || !game->player->img[1]) return NULL;
-    ft_strcpy(game->player->img[0], "imgs/p1.xpm");
-    ft_strcpy(game->player->img[1], "imgs/p2.xpm");
+
     img_path = ft_get_image_name(*game, image_id);
     if (!img_path)
         return (NULL);
-    return img_path;
+    return img_path;    // printf("\n====> left || COL[%d]<====\n", game->map->col);
+
 }
+
 
 int ft_gen_window(t_slong *game)
 {
-    int i, j, flag;
+    int i;
+    int j;
+    int flag;
     void *img;
     char *path;
+
     i = -1;
     while (++i < game->map->n_row)
     {
-        j = 0;
-        while (j < game->map->n_colums)
+        j = -1;
+        while (++j < game->map->n_colums)
         {
             flag = ft_get_image_id(game->map->grid[i][j], i , j , game->map); 
-            printf("\nimg_id==>(%d)  i\\j (%d\\%d)\n", flag, i ,j);
             path = ft_get_img_path(game, flag);
-            printf("\n====(%s) | (%c)\n", path, game->map->grid[i][j]);
-            // Check if path is NULL before using it
-            if (!path) return 0;
+            if (!path) return (ft_destroy_game(game),ft_destroy_game(game),0);
             img = mlx_xpm_file_to_image(game->mlx, path, &(int){18}, &(int){18});
-            if (img == NULL) {
-                printf("\nerror in image setting (%s)\n", path);
-                return 0;
-            }
+            if (img == NULL)
+               return(ft_destroy_game(game), 0);
             mlx_put_image_to_window(game->mlx, game->win, img, j * 18, i * 18);
-            j++;
+            mlx_destroy_image(game->mlx, img);        
         }
     }
     return 1;
@@ -589,42 +601,248 @@ int ft_gen_window(t_slong *game)
 =============================================================>mlx (code ) and implimentaion<==============================================
 */
 
-// int ft_gen_window(t_slong *game)
-// {
-    
-//     return (1);
-// }
+int ft_swap_up(t_slong *game, int x, int y)
+{
+    char tmp;
 
+    tmp = game->map->grid[x][y];
+    if (game->map->grid[x - 1][y] == 'C')
+    {
+        game->map->col = game->map->col - 1;
+        game->map->grid[x][y] = '0';
+    }
+    else 
+        game->map->grid[x][y] = game->map->grid[x -1][y];
+    game->map->grid[x - 1][y] = tmp;
+    game->player->x = x - 1;
+    if (!ft_gen_window(game))
+        return (0);
+    return (1);
+}
 
+int ft_swap_down(t_slong *game, int x, int y)
+{
+    char tmp;
 
+    tmp = game->map->grid[x][y];
+    if (game->map->grid[x + 1][y] == 'C')
+    {
+        game->map->col = game->map->col - 1;
+        game->map->grid[x][y] = '0';
+    }
+    else 
+        game->map->grid[x][y] = game->map->grid[x + 1][y];
+    game->map->grid[x + 1][y] = tmp;
+    game->player->x = x + 1;
+    if (!ft_gen_window(game))
+        return (0);
+    return (1);
+}
 
-int ft_init_game(t_slong game)
+int ft_swap_left(t_slong *game, int x, int y)
+{
+    char tmp;
+
+    tmp = game->map->grid[x][y];
+    if (game->map->grid[x][y - 1] == 'C')
+    {
+        // printf("\nCOLL BEFOR [%d]\n", game->map->col);
+        game->map->col = game->map->col - 1;
+        // printf("\nCOLL AFTER [%d]\n", game->map->col);
+        game->map->grid[x][y] = '0';
+    }
+    else 
+        game->map->grid[x][y] = game->map->grid[x][y - 1];
+    game->map->grid[x][y - 1] = tmp;
+    game->player->y = y - 1;
+    if (!ft_gen_window(game))
+        return (0);
+    return (1);
+}
+int ft_swap_right(t_slong *game, int x, int y)
+{
+    char tmp;
+
+    tmp = game->map->grid[x][y];
+    if (game->map->grid[x][y + 1] == 'C')
+    {
+        // printf("\nCOLL BEFOR [%d]\n", game->map->col);
+        game->map->col = game->map->col - 1;
+        // printf("\nCOLL AFTER [%d]\n", game->map->col);
+        game->map->grid[x][y] = '0';
+    }
+    else 
+        game->map->grid[x][y] = game->map->grid[x][y+1];
+    game->map->grid[x][y + 1] = tmp;
+    game->player->y = y + 1;
+    if (!ft_gen_window(game))
+        return (0);
+    return (1);
+}
+
+int ft_check_enemy(t_slong *game, int x, int y)
+{
+    t_enemy *tmp;
+
+    tmp = game->enemy;
+    while (tmp)
+    {
+        if (tmp->x == x && tmp->y == y)
+            return (1);
+        tmp = tmp->next;
+    }
+    return (0);
+}
+
+int ft_move_up(t_slong *game)
+{
+    // printf("\n====> UP || COL[%d]<====\n", game->map->col);
+
+    if (game->map->grid[game->player->x - 1][game->player->y] == '1'
+        || (game->map->grid[game->player->x - 1][game->player->y] == 'E' && game->map->col))
+        return (1);
+    else if (game->map->grid[game->player->x - 1][game->player->y] == 'E' && !game->map->col)
+    {
+        ft_destroy_game(game);
+        exit (0);
+    }
+    else
+        return (ft_swap_up(game, game->player->x , game->player->y), 1);
+    // else if (ft_check_enemy(game, x - 1, y - 1))
+    //     return (-1);
+    return (1);
+}
+
+int ft_move_down(t_slong *game)
+{
+    int x;
+    int y;
+
+    // printf("\n====> DOWN || COL[%d]<====\n", game->map->col);
+    x = game->player->x;
+    y = game->player->y;
+    if (game->map->grid[x + 1][y] == '1'
+        || (game->map->grid[game->player->x + 1][game->player->y] == 'E' && game->map->col))
+        return (1);
+    else if (game->map->grid[x + 1][y] == 'E' && !game->map->col)
+    {
+        ft_destroy_game(game);
+        exit(0);
+    }
+    else
+        return (ft_swap_down(game, x, y),1);
+    // else if (ft_check_enemy(game, x - 1, y - 1))
+    //     return (-1);
+    return (1);
+}
+
+int ft_move_left(t_slong *game)
+{
+    int x;
+    int y;
+
+    // printf("\n====> left || COL[%d]<====\n", game->map->col);
+    x = game->player->x;
+    y = game->player->y;
+    if (game->map->grid[x ][y - 1] == '1'
+    || (game->map->grid[game->player->x][game->player->y - 1] == 'E' && game->map->col))
+        return (1);
+    else if (game->map->grid[x][y - 1] == 'E' && !game->map->col)
+    {
+        ft_destroy_game(game);
+        exit(0);
+    }
+    else
+        return (ft_swap_left(game, x, y),1);
+    // else if (ft_check_enemy(game, x - 1, y - 1))
+    //     return (-1);
+    return (1);
+}
+
+int ft_move_right(t_slong *game)
+{
+    int x;
+    int y;
+
+    // printf("\n====> right || COL[%d]<====\n", game->map->col);
+    x = game->player->x;
+    y = game->player->y;
+    if (game->map->grid[x ][y + 1] == '1'
+        || (game->map->grid[game->player->x][game->player->y + 1] == 'E' && game->map->col))
+        return (1);
+    else if (game->map->grid[x][y + 1] == 'E' && !game->map->col)
+    {
+        ft_destroy_game(game);
+        exit(0);
+    }
+    else
+        return (ft_swap_right(game, x, y),1);
+    // else if (ft_check_enemy(game, x - 1, y - 1))
+    //     return (-1);
+    return (1);
+}
+int	key_hook(int keycode, t_slong *game)
+{
+    game->cur_moves = game->cur_moves ;
+   
+    printf("CURRENT MOVE IS : %d\n", game->cur_moves++);
+    printf("\n=n_col (%d)\n", game->map->col);
+    if (keycode == ESC)
+    {
+        ft_destroy_game(game);
+        exit(0);
+    }
+    else if (keycode == KEY_UP)
+        return (ft_move_up(game));
+    else if (keycode == KEY_DOWN)
+        return (ft_move_down(game));
+    else if (keycode == KEY_LEFT)
+        return (ft_move_left(game));
+    else if (keycode == KEY_RIGHT)
+        return (ft_move_right(game));
+	return (0);
+}
+
+int	mouse_hook(int keycode, t_slong *vars)
+{
+	printf("key code ; (%d)\n", keycode);
+	return (0);
+}
+
+int	ft_close(int button,int x, int y, t_slong *vars)
+{
+    printf("==(%d | %d)", x, y);
+	// mlx_destroy_window(vars->mlx, vars->win);
+	return (0);
+}
+
+int ft_init_game(t_slong *game)
 {
     int with;
     int height;
 
-    printf("\n number of col : (%d) number of rows : (%d)\n", game.map->n_colums, game.map->n_row);
-
-    with = game.map->n_colums * 18;
-    height = game.map->n_row * 18;
-    game.mlx = mlx_init();
-    game.win = mlx_new_window(game.mlx, with, height, "So_oLong");
-	if (! ft_gen_window(&game))
-    {
-        printf("\n====>errrrrrrrrrrrrrrrrrrrrrrrrrrror<==\n");
-        return (0);
-    }
-    mlx_loop(game.mlx);
+    with = game->map->n_colums * 18;
+    height = game->map->n_row * 18;
+    game->player = ft_gen_player(game->map->grid,game->map->n_row, game->map->n_colums);
+    if (!game->player)
+        return (ft_destroy_game(game), 0);
+    game->mlx = mlx_init();
+    game->win = mlx_new_window(game->mlx, with, height, "S0__0Long");
+	if (! ft_gen_window(game))
+        return (ft_destroy_game(game), 0);
+    // mlx_mouse_hook(game->win, mouse_hook, game);
+	// mlx_hook(game.win ,4 , 1L<<2, ft_close, &game);
+	mlx_key_hook(game->win, key_hook, game);
+    mlx_loop(game->mlx);
+    mlx_destroy_window( game->mlx, game->win);
+    mlx_destroy_display(game->mlx);
+    free(game->mlx);
     return (1);
 }
-
-
 
 /*
 ============================================================>end of mlx implimention<=====================================================
 */
-
-
 
 int main(int ac, char **av)
 {
@@ -632,15 +850,17 @@ int main(int ac, char **av)
 
     if (ac != 2)
         return 1;
-
+    game.player = NULL;
+    game.map = NULL;
+    game.cur_moves = 0;
+    game.mlx = NULL;
     if (!ft_init_requirement(&game, av[1]))
         return (printf("==> MAP ERROR <==\n"), ft_destroy_game(&game), 1);
     if (! ft_validate_map(&game, av[1]))
-        return (printf("==> MAP ERROR IN VALIDATING <==\n"),ft_destroy_game(&game), 1);
-    if (!ft_init_game(game))
-        ft_destroy_game(&game);
+        return (ft_destroy_game(&game), 1);
+    // printf("\n===inting game      ====(%d)===", ft_init_game(game));
+    // printf("==> MAP ERROR IN VALIDATING <==\n"),
+    if (!ft_init_game(&game))
+        return (1);
     return 0;
 }
-    // var_dump(game.map->grid, game.map->n_row, game.map->n_colums);
-    
-    // // // Other operations if needed

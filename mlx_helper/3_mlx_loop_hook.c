@@ -1,4 +1,4 @@
-#include "minilibx-linux/mlx.h"
+#include "../minilibx-linux/mlx.h"
 #include <stdio.h>
 #include <unistd.h>
 
@@ -32,7 +32,7 @@ int     change_color(tdata *data)
         data->color = 0x0000FF;        // Change to blue
     else
         data->color = 0xFF0000;        // Otherwise, go back to red
-
+    sleep(1);
     return (0);
 }
 
@@ -53,9 +53,9 @@ int     main(void)
 
     //mlx_loop_hook is one hook that is triggered when there's no event processed.
     //Cool to have a continuous rendering on the screen
-//    mlx_loop_hook(data.mlx,
-//                change_color,
-//                &data);
+   mlx_loop_hook(data.mlx,
+               change_color,
+               &data);
     mlx_loop(data.mlx);
 
     return (0);

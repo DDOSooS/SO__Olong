@@ -6,7 +6,7 @@
 /*   By: aghergho < aghergho@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/01 10:52:21 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/22 09:43:37 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/22 18:21:30 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,12 @@
 #  define BUFFER_SIZE 42
 # endif
 
+
+#define KEY_LEFT 65361
+#define KEY_UP 65362
+#define KEY_RIGHT 65363
+#define KEY_DOWN 65364
+#define ESC 65307
 /*
     get_next_line functions
 */
@@ -47,11 +53,10 @@ typedef struct enemy
 
 typedef struct player
 {
-    int             x;
-    int             y;
-    int             flag;
-    char            *img[2];
-    struct player   *next;
+    int             x;//4
+    int             y;//4
+    int             flag; //4
+    char            *img[2]; //2 * 8 =  32
 } t_player;
 
 typedef struct map
@@ -62,7 +67,6 @@ typedef struct map
     int         exit;
     int         n_colums;
     int         n_row;
-    struct map  *next;
 }   t_map;
 
 typedef struct  so_long
@@ -72,7 +76,7 @@ typedef struct  so_long
     int		    cur_moves;
     t_map	    *map;
     t_player    *player;
-    // t_enemy *enemy;
+    t_enemy *enemy;
 }   t_slong ;
 
 

@@ -1,6 +1,6 @@
 NAME = ./so_long
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = 
 LIBRARY = libft/libft.a
 LIBX = minilibx-linux/libmlx_Linux.a
 RM = rm -rf 
@@ -16,7 +16,7 @@ $(LIBX) :
 	$(MAKE) -C minilibx-linux 
 
 $(NAME) : $(OBJ) $(LIBRARY) $(LIBX)
-	$(CC)  $(CFLAGS) -Lminilibx-linux  -lmlx_Linux $^ -o $@ -lX11 -lXext 
+	$(CC)  $(CFLAGS) -Lminilibx-linux  -lmlx_Linux  $^ -o $@ -lX11 -lXext 
 
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@

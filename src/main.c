@@ -164,6 +164,10 @@ t_map   *ft_new_map()
     map->col = 0;
     map->exit = 0;
     map->grid = NULL;
+    map->wall_img[0] = "imgs/w1.xpm";
+    map->wall_img[1] = "imgs/w2.xpm";
+    // map->wall_img[2] = "imgs/w3.xpm";
+    // map->wall_img[3] = "imgs/w4.xpm";
     return (map);
 }
 
@@ -424,6 +428,7 @@ int ft_validate_map(t_slong *game, char *map_file)
 /*
     ===> end of validating the map
 */
+
 void var_dump(char **map, int row, int col)
 {
 
@@ -479,7 +484,7 @@ int ft_get_image_id(char component, int i, int j, t_map *map)
     return (ft_get_image_id_helper(component));
 }
 
-char *ft_get_absolute_component(int id)
+char *ft_get_absolute_component(char **texture,int id)
 {
     if (id == 0)
         return ("imgs/tl.xpm");
@@ -498,10 +503,9 @@ char *ft_get_absolute_component(int id)
     else if (id == 7)
         return ("imgs/r.xpm");
     else if (id == 11)
-        return ("imgs/00.xpm");
-    return ("imgs/w1.xpm");
+        return ("imgs/00.xpm"); 
+    return (texture[rand() % 2]);
 }
-
 
 char *ft_get_image_name(t_slong game, int img_id)
 {
@@ -509,19 +513,24 @@ char *ft_get_image_name(t_slong game, int img_id)
 
     img_name = NULL;
     if ((img_id >= 0 && img_id <= 7) || img_id == 11 || img_id == 12)
-        img_name = ft_get_absolute_component(img_id);
+        img_name = ft_get_absolute_component(game.map->wall_img, img_id);
     else if (img_id == 8)
     {
-        img_name =  game.player->img[0];
+        if (game.player->flag)
+        {
+            img_name =  game.player->img[1];
+            game.player->flag = 0;
+        }
+        else
+        {
+            img_name =  game.player->img[0];
+            game.player->flag = 1;
+        }
     }
     else if (img_id == 9)
-    {
         img_name = "imgs/key.xpm";
-    }
     else if (img_id == 10)
-    {
         img_name = "imgs/exit.xpm";
-    }
     return (img_name);
 }
 
@@ -565,10 +574,8 @@ char *ft_get_img_path(t_slong *game, int image_id)
     img_path = ft_get_image_name(*game, image_id);
     if (!img_path)
         return (NULL);
-    return img_path;    // printf("\n====> left || COL[%d]<====\n", game->map->col);
-
+    return img_path;
 }
-
 
 int ft_gen_window(t_slong *game)
 {
@@ -646,9 +653,7 @@ int ft_swap_left(t_slong *game, int x, int y)
     tmp = game->map->grid[x][y];
     if (game->map->grid[x][y - 1] == 'C')
     {
-        // printf("\nCOLL BEFOR [%d]\n", game->map->col);
         game->map->col = game->map->col - 1;
-        // printf("\nCOLL AFTER [%d]\n", game->map->col);
         game->map->grid[x][y] = '0';
     }
     else 
@@ -659,6 +664,7 @@ int ft_swap_left(t_slong *game, int x, int y)
         return (0);
     return (1);
 }
+
 int ft_swap_right(t_slong *game, int x, int y)
 {
     char tmp;
@@ -666,9 +672,7 @@ int ft_swap_right(t_slong *game, int x, int y)
     tmp = game->map->grid[x][y];
     if (game->map->grid[x][y + 1] == 'C')
     {
-        // printf("\nCOLL BEFOR [%d]\n", game->map->col);
         game->map->col = game->map->col - 1;
-        // printf("\nCOLL AFTER [%d]\n", game->map->col);
         game->map->grid[x][y] = '0';
     }
     else 
@@ -696,8 +700,6 @@ int ft_check_enemy(t_slong *game, int x, int y)
 
 int ft_move_up(t_slong *game)
 {
-    // printf("\n====> UP || COL[%d]<====\n", game->map->col);
-
     if (game->map->grid[game->player->x - 1][game->player->y] == '1'
         || (game->map->grid[game->player->x - 1][game->player->y] == 'E' && game->map->col))
         return (1);
@@ -718,7 +720,6 @@ int ft_move_down(t_slong *game)
     int x;
     int y;
 
-    // printf("\n====> DOWN || COL[%d]<====\n", game->map->col);
     x = game->player->x;
     y = game->player->y;
     if (game->map->grid[x + 1][y] == '1'
@@ -741,7 +742,6 @@ int ft_move_left(t_slong *game)
     int x;
     int y;
 
-    // printf("\n====> left || COL[%d]<====\n", game->map->col);
     x = game->player->x;
     y = game->player->y;
     if (game->map->grid[x ][y - 1] == '1'
@@ -764,7 +764,6 @@ int ft_move_right(t_slong *game)
     int x;
     int y;
 
-    // printf("\n====> right || COL[%d]<====\n", game->map->col);
     x = game->player->x;
     y = game->player->y;
     if (game->map->grid[x ][y + 1] == '1'
@@ -786,7 +785,6 @@ int	key_hook(int keycode, t_slong *game)
     game->cur_moves = game->cur_moves ;
    
     printf("CURRENT MOVE IS : %d\n", game->cur_moves++);
-    printf("\n=n_col (%d)\n", game->map->col);
     if (keycode == ESC)
     {
         ft_destroy_game(game);
@@ -800,19 +798,6 @@ int	key_hook(int keycode, t_slong *game)
         return (ft_move_left(game));
     else if (keycode == KEY_RIGHT)
         return (ft_move_right(game));
-	return (0);
-}
-
-int	mouse_hook(int keycode, t_slong *vars)
-{
-	printf("key code ; (%d)\n", keycode);
-	return (0);
-}
-
-int	ft_close(int button,int x, int y, t_slong *vars)
-{
-    printf("==(%d | %d)", x, y);
-	// mlx_destroy_window(vars->mlx, vars->win);
 	return (0);
 }
 

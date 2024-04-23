@@ -6,7 +6,7 @@
 /*   By: aghergho < aghergho@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/01 10:52:21 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/22 18:21:30 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/23 10:29:18 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <limits.h>
 # include "../libft/libft.h"
 # include <fcntl.h>
+#include <stdlib.h>
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 42
@@ -62,11 +63,12 @@ typedef struct player
 typedef struct map
 {
     char        **grid;
-    int         player;
+    int         player; 
     int         col;
     int         exit;
     int         n_colums;
     int         n_row;
+    char        *wall_img[4];
 }   t_map;
 
 typedef struct  so_long

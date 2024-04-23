@@ -47,23 +47,25 @@ void ft_free_grid(char **grid, int n_row)
 
 void ft_destroy_game(t_slong *game)
 {
-    if (game->map && game->map->grid)
+    if (game->map)
+    {
         ft_free_grid(game->map->grid, game->map->n_row);
+        free(game->map);
+    }
     if (game->player != NULL)
     {
         free(game->player->img[0]);
         free(game->player->img[1]);
         free(game->player);
     }
-    free(game->map);
-    if (game->win)
+    if (game->mlx)
     {
         mlx_destroy_window(game->mlx, game->win);
         mlx_destroy_display(game->mlx);
         free(game->mlx);
     }
 }
-
+ 
 int *ft_gen_row(char *line) 
 {
     int *row;
@@ -175,7 +177,10 @@ int ft_init_requirement(t_slong *game, char *map_file)
 
     fd = open(map_file, O_RDONLY);
     if (fd == -1 || !ft_check_extension(map_file))
+    {
+        printf("extention error");
         return 0;
+    }
     game->map = ft_new_map();
     if (!game->map)
         return 0;
@@ -256,7 +261,7 @@ char **ft_init_map(char **grid, int n_row, int n_col)
             j++;
         }
         i++;
-    }
+    }  
     return grid;
 }
 
@@ -482,7 +487,27 @@ int ft_get_image_id(char component, int i, int j, t_map *map)
     return (ft_get_image_id_helper(component));
 }
 
-char *ft_get_absolute_component(char **texture,int id)
+char *ft_get_wall(t_map *map, int i, int j)
+{
+    char *img;
+
+    if (j <= map->n_colums / 2 )
+    {
+        if (i < map->n_row / 2)
+            img = map->wall_img[0];
+        else
+            img = map->wall_img[1];
+    }
+    else
+    {
+        if (i < map->n_row / 2)
+            img = map->wall_img[1];
+        else
+            img = map->wall_img[0];
+    }
+    return (img);
+}
+char *ft_get_absolute_component(t_map *map,int id, int i, int j)
 {
     if (id == 0)
         return ("imgs/walls/tl.xpm");
@@ -502,16 +527,16 @@ char *ft_get_absolute_component(char **texture,int id)
         return ("imgs/walls/r.xpm");
     else if (id == 11)
         return ("imgs/walls/0.xpm"); 
-    return (texture[rand() % 2]);
+    return (ft_get_wall(map, i, j));
 } 
 
-char *ft_get_image_name(t_slong game, int img_id)
+char *ft_get_image_name(t_slong game, int img_id, int i, int j)
 {
     char *img_name;
 
     img_name = NULL;
     if ((img_id >= 0 && img_id <= 7) || img_id == 11 || img_id == 12)
-        img_name = ft_get_absolute_component(game.map->wall_img, img_id);
+        img_name = ft_get_absolute_component(game.map, img_id, i, j);
     else if (img_id == 8)
     {
         if (game.player->flag)
@@ -563,14 +588,13 @@ t_player *ft_gen_player(char **grid, int n_rows, int n_col)
     player->x = ft_getx_component_position(grid,n_rows, n_col,'P');
     player->y = ft_gety_component_position(grid,n_rows, n_col,'P');
     player->flag = 0;
-    printf("hooooooooooooooooo");
     return (player);
 }
-char *ft_get_img_path(t_slong *game, int image_id)
+char *ft_get_img_path(t_slong *game, int image_id, int i, int j)
 {
     char *img_path;
 
-    img_path = ft_get_image_name(*game, image_id);
+    img_path = ft_get_image_name(*game, image_id, i,j);
     if (!img_path)
         return (NULL);
     return img_path;
@@ -591,8 +615,8 @@ int ft_gen_window(t_slong *game)
         while (++j < game->map->n_colums)
         {
             flag = ft_get_image_id(game->map->grid[i][j], i , j , game->map); 
-            path = ft_get_img_path(game, flag);
-            if (!path) return (ft_destroy_game(game),ft_destroy_game(game),0);
+            path = ft_get_img_path(game, flag, i, j);
+            if (!path) return (ft_destroy_game(game),0);
             img = mlx_xpm_file_to_image(game->mlx, path, &(int){32}, &(int){32});
             if (img == NULL)
                return(ft_destroy_game(game), 0);
@@ -805,7 +829,6 @@ int ft_init_game(t_slong *game)
     int with;
     int height;
 
-    printf("ddddddddd done");
     with = game->map->n_colums * 32;
     height = game->map->n_row * 32;
     game->player = ft_gen_player(game->map->grid,game->map->n_row, game->map->n_colums);
@@ -814,7 +837,7 @@ int ft_init_game(t_slong *game)
     game->mlx = mlx_init();
     game->win = mlx_new_window(game->mlx, with, height, "S0__0Long");
 	if (! ft_gen_window(game))
-        return (ft_destroy_game(game), 0);
+        return (0);
     // mlx_mouse_hook(game->win, mouse_hook, game);
 	// mlx_hook(game.win ,4 , 1L<<2, ft_close, &game);
 	mlx_key_hook(game->win, key_hook, game);
@@ -844,7 +867,6 @@ int main(int ac, char **av)
     
     if (! ft_validate_map(&game, av[1]))
         return (ft_destroy_game(&game), 1);
-    printf("window  done");
     // printf("\n===inting game      ====(%d)===", ft_init_game(game));
     // printf("==> MAP ERROR IN VALIDATING <==\n"),
     if (!ft_init_game(&game))

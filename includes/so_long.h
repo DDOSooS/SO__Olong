@@ -6,7 +6,7 @@
 /*   By: aghergho < aghergho@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/01 10:52:21 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/23 10:29:18 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/23 17:02:37 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ typedef struct map
     int         exit;
     int         n_colums;
     int         n_row;
-    char        *wall_img[4];
+    char        *wall_img[2];
 }   t_map;
 
 typedef struct  so_long

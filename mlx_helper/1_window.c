@@ -36,7 +36,7 @@ int	main()
 	// Without this loop the process will stop immediately
 	/*
 	 * The minilibx library has a function called mlx_loop. 
-	 * This function starts what's known as an event loop. 
+	 * This function starts what's known a,as an event loop. 
 	 * An event loop keeps the application running and constantly 
 	 * checks for events, such as user input (like mouse clicks or keyboard presses). 
 	 * As long as the application is running, this loop continues to execute.

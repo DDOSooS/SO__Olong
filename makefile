@@ -16,7 +16,7 @@ $(LIBX) :
 	$(MAKE) -C minilibx-linux 
 
 $(NAME) : $(OBJ) $(LIBRARY) $(LIBX)
-	$(CC)  $(CFLAGS) -fsanitize=address -Lminilibx-linux  -lmlx_Linux  $^ -o $@ -lX11 -lXext 
+	$(CC)  $(CFLAGS)  -Lminilibx-linux  -lmlx_Linux  $^ -o $@ -lX11 -lXext 
 
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@

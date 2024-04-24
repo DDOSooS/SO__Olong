@@ -53,11 +53,7 @@ void ft_destroy_game(t_slong *game)
         free(game->map);
     }
     if (game->player != NULL)
-    {
-        free(game->player->img[0]);
-        free(game->player->img[1]);
         free(game->player);
-    }
     if (game->mlx)
     {
         mlx_destroy_window(game->mlx, game->win);
@@ -153,6 +149,34 @@ int ft_count_collums(char *map_file, int n_row)
     return (col);
 }
 
+
+void ft_set_enemy_img(t_map **map)
+{
+    (*map)->enemy_img[0] =  "imgs/enemy/e1.xpm";
+    (*map)->enemy_img[1] =  "imgs/enemy/e2.xpm";
+    (*map)->enemy_img[2] =  "imgs/enemy/e3.xpm";
+    (*map)->enemy_img[3] =  "imgs/enemy/e4.xpm";
+    (*map)->enemy_img[4] =  "imgs/enemy/e5.xpm";
+    (*map)->enemy_img[5] =  "imgs/enemy/e6.xpm";
+    (*map)->enemy_img[6] =  "imgs/enemy/e7.xpm";
+    (*map)->enemy_img[7] =  "imgs/enemy/e8.xpm";
+    (*map)->enemy_img[8] =  "imgs/enemy/e9.xpm";
+    (*map)->enemy_img[9] =  "imgs/enemy/e10.xpm";
+    (*map)->enemy_img[10] =  "imgs/enemy/e11.xpm";
+}
+
+void ft_set_col_img(t_map **map)
+{
+    (*map)->coll_img[0] = "imgs/col/k1.xpm";
+    (*map)->coll_img[1] = "imgs/col/k2.xpm";
+    (*map)->coll_img[2] = "imgs/col/k3.xpm";
+    (*map)->coll_img[3] = "imgs/col/k4.xpm";
+    (*map)->coll_img[4] = "imgs/col/k5.xpm";
+    (*map)->coll_img[5] = "imgs/col/k6.xpm";
+    (*map)->coll_img[6] = "imgs/col/k7.xpm";
+    (*map)->coll_img[7] = "imgs/col/k8.xpm";
+}
+
 t_map   *ft_new_map()
 {
     t_map *map;
@@ -168,6 +192,10 @@ t_map   *ft_new_map()
     map->grid = NULL;
     map->wall_img[0] = "imgs/walls/w1.xpm";
     map->wall_img[1] = "imgs/walls/w2.xpm";
+    map->exit_img[0] = "imgs/exit/ex1.xpm";
+    map->exit_img[1] = "imgs/exit/ex2.xpm";
+    ft_set_enemy_img(&map);
+    ft_set_col_img(&map);
     return (map);
 }
 
@@ -177,10 +205,7 @@ int ft_init_requirement(t_slong *game, char *map_file)
 
     fd = open(map_file, O_RDONLY);
     if (fd == -1 || !ft_check_extension(map_file))
-    {
-        printf("extention error");
-        return 0;
-    }
+        return (printf("error\nextention error"),0);
     game->map = ft_new_map();
     if (!game->map)
         return 0;
@@ -269,7 +294,7 @@ void dfs(char ***grid, int i, int y, t_map *map)
 {
     if (i < 0 || i >= map->n_row || y < 0 || y >= map->n_colums)
         return;
-    if ((*grid)[i][y] == '1')
+    if ((*grid)[i][y] == '1' || (*grid)[i][y] == 'I')
         return;
     if ((*grid)[i][y] != 'v')
         (*grid)[i][y] = 'v';
@@ -347,7 +372,7 @@ int ft_check_walls(char c)
     return (0);
 }
 
-int ft_check_component(t_slong **game, char c)
+int ft_check_component(t_slong **game, char c, int i, int j)
 {
     if (c == '1')
         return (1);
@@ -368,6 +393,8 @@ int ft_check_component(t_slong **game, char c)
         (*game)->map->player = (*game)->map->player + 1;
         return (1);
     }
+    else if (c == 'I')
+        return (1);
     return (0);
 }
 
@@ -398,7 +425,7 @@ int ft_check_map_component(t_slong **game, int rows, int cols)
                 if (! ft_check_walls((*game)->map->grid[i][j]))
                     return(0);
             }
-            else if (! ft_check_component(game, (*game)->map->grid[i][j]))
+            else if (! ft_check_component(game, (*game)->map->grid[i][j], i, j))
                 return (0);
         }
     }
@@ -406,18 +433,15 @@ int ft_check_map_component(t_slong **game, int rows, int cols)
         return (0);
     return (1);
 }
-
+ 
 int ft_validate_map(t_slong *game, char *map_file)
 {
-    if (game->map->n_row == game->map->n_colums)
-        return (0);
     if (! ft_check_map_component(&game, game->map->n_row, game->map->n_colums))
-        return (0);
-        //  printf("\n==> map component error <==\n"),
+        return (printf("error\n==>>map component error <==\n"),0);
     if (! ft_check_valid_path(game->map, game->map->n_row, game->map->n_colums))
-        return (0);
+        return (printf("error\n==>>the no Valid Path <==\n"),0);
     game->map->col = ft_count_collectible(game->map->grid, game->map->n_row, game->map->n_colums);
-    printf("\n==> map component is Valid <==\n");
+    // printf("\n==> map component is Valid <==\n");
     ft_free_grid(game->map->grid, game->map->n_row);
     game->map->grid = malloc(sizeof(char *) * game->map->n_row);
     if (!game->map->grid)
@@ -456,8 +480,9 @@ int ft_get_image_id_helper(char compenent)
 {
     if (compenent == '0')
         return (11);
-    return (12);    // printf("\n====> left || COL[%d]<====\n", game->map->col);
-
+    else if (compenent == '1')
+        return (12);    // printf("\n====> left || COL[%d]<====\n", game->map->col);
+    return (13);
 }
 
 int ft_get_image_id(char component, int i, int j, t_map *map)
@@ -507,6 +532,7 @@ char *ft_get_wall(t_map *map, int i, int j)
     }
     return (img);
 }
+
 char *ft_get_absolute_component(t_map *map,int id, int i, int j)
 {
     if (id == 0)
@@ -526,16 +552,19 @@ char *ft_get_absolute_component(t_map *map,int id, int i, int j)
     else if (id == 7)
         return ("imgs/walls/r.xpm");
     else if (id == 11)
-        return ("imgs/walls/0.xpm"); 
+        return ("imgs/walls/0.xpm");
+    else if (id == 13)
+        return ("imgs/enemy/e1.xpm");
     return (ft_get_wall(map, i, j));
 } 
+
 
 char *ft_get_image_name(t_slong game, int img_id, int i, int j)
 {
     char *img_name;
 
     img_name = NULL;
-    if ((img_id >= 0 && img_id <= 7) || img_id == 11 || img_id == 12)
+    if ((img_id >= 0 && img_id <= 7) || img_id == 11 || img_id == 12 || img_id == 13)
         img_name = ft_get_absolute_component(game.map, img_id, i, j);
     else if (img_id == 8)
     {
@@ -572,7 +601,6 @@ char *ft_strcpy(char *s1, const char *s2)
     s1[i] = '\0';
     return s1;
 }
-
 t_player *ft_gen_player(char **grid, int n_rows, int n_col)
 {
     t_player *player;
@@ -580,16 +608,26 @@ t_player *ft_gen_player(char **grid, int n_rows, int n_col)
     player = malloc(sizeof(t_player));
     if (!player)
         return NULL;
-    player->img[0] = malloc(strlen("imgs/player/p1.xpm") + 1);
-    player->img[1] = malloc(strlen("imgs/player/p2.xpm") + 1);
-    if (!player->img[0] || !player->img[1]) return NULL;
-    ft_strcpy(player->img[0], "imgs/player/p1.xpm");
-    ft_strcpy(player->img[1], "imgs/player/p2.xpm");
     player->x = ft_getx_component_position(grid,n_rows, n_col,'P');
     player->y = ft_gety_component_position(grid,n_rows, n_col,'P');
+    player->img[0] = "imgs/player/p1.xpm";
+    player->img[1] = "imgs/player/p2.xpm";
+    player->img[2] = "imgs/player/p3.xpm";
+    player->img[3] = "imgs/player/p4.xpm";
+    player->img[4] = "imgs/player/p5.xpm";
+    player->img[5] = "imgs/player/p6.xpm";
+    player->img[6] = "imgs/player/p7.xpm";
+    player->img[7] = "imgs/player/p8.xpm";
+    player->img[8] = "imgs/player/p9.xpm";
+    player->img[9] = "imgs/player/p10.xpm";
+    player->img[10] = "imgs/player/p11.xpm";
+    player->img[11] = "imgs/player/p12.xpm";
+    player->img[12] = "imgs/player/p13.xpm";
+    player->img[13] = "imgs/player/p14.xpm";
     player->flag = 0;
     return (player);
 }
+
 char *ft_get_img_path(t_slong *game, int image_id, int i, int j)
 {
     char *img_path;
@@ -619,7 +657,7 @@ int ft_gen_window(t_slong *game)
             if (!path) return (ft_destroy_game(game),0);
             img = mlx_xpm_file_to_image(game->mlx, path, &(int){32}, &(int){32});
             if (img == NULL)
-               return(ft_destroy_game(game), 0);
+               return(printf ("error\nPleas make sure that ur images is valid"),ft_destroy_game(game), 0);
             mlx_put_image_to_window(game->mlx, game->win, img, j * 32, i * 32);
             mlx_destroy_image(game->mlx, img);        
         }
@@ -707,20 +745,6 @@ int ft_swap_right(t_slong *game, int x, int y)
     return (1);
 }
 
-int ft_check_enemy(t_slong *game, int x, int y)
-{
-    t_enemy *tmp;
-
-    tmp = game->enemy;
-    while (tmp)
-    {
-        if (tmp->x == x && tmp->y == y)
-            return (1);
-        tmp = tmp->next;
-    }
-    return (0);
-}
-
 int ft_move_up(t_slong *game)
 {
     if (game->map->grid[game->player->x - 1][game->player->y] == '1'
@@ -731,10 +755,13 @@ int ft_move_up(t_slong *game)
         ft_destroy_game(game);
         exit (0);
     }
+    else if (game->map->grid[game->player->x - 1][game->player->y] == 'I')
+    {
+        ft_destroy_game(game);
+        exit(0);
+    }
     else
         return (ft_swap_up(game, game->player->x , game->player->y), 1);
-    // else if (ft_check_enemy(game, x - 1, y - 1))
-    //     return (-1);
     return (1);
 }
 
@@ -753,10 +780,13 @@ int ft_move_down(t_slong *game)
         ft_destroy_game(game);
         exit(0);
     }
+    else if (game->map->grid[game->player->x + 1][game->player->y] == 'I')
+    {
+        ft_destroy_game(game);
+        exit(0);
+    }
     else
         return (ft_swap_down(game, x, y),1);
-    // else if (ft_check_enemy(game, x - 1, y - 1))
-    //     return (-1);
     return (1);
 }
 
@@ -775,10 +805,13 @@ int ft_move_left(t_slong *game)
         ft_destroy_game(game);
         exit(0);
     }
+    else if (game->map->grid[game->player->x][game->player->y - 1] == 'I')
+    {
+        ft_destroy_game(game);
+        exit(0);
+    }
     else
         return (ft_swap_left(game, x, y),1);
-    // else if (ft_check_enemy(game, x - 1, y - 1))
-    //     return (-1);
     return (1);
 }
 
@@ -797,10 +830,13 @@ int ft_move_right(t_slong *game)
         ft_destroy_game(game);
         exit(0);
     }
+    else if (game->map->grid[game->player->x][game->player->y + 1] == 'I')
+    {
+        ft_destroy_game(game);
+        exit(0);
+    }
     else
         return (ft_swap_right(game, x, y),1);
-    // else if (ft_check_enemy(game, x - 1, y - 1))
-    //     return (-1);
     return (1);
 }
 int	key_hook(int keycode, t_slong *game)
@@ -824,23 +860,149 @@ int	key_hook(int keycode, t_slong *game)
 	return (0);
 }
 
+
+int ft_animate_player(t_slong *game, int i, int j)
+{
+    int flag;
+    int index;
+    void    *img;
+
+    index = 0;
+    flag = -1;
+    while (++flag)
+    {
+        printf("\nflag==(%d) \n",flag);
+        img = mlx_xpm_file_to_image(game->mlx, game->player->img[index], &(int){32}, &(int){32});
+        mlx_put_image_to_window(game->mlx, game->win, img, j * 32, i * 32);
+        if (flag == 100)
+        {
+            index++;
+            flag = 0;
+        }
+        if (index == 14)
+            index = 0;
+    }
+    return (1);
+}
+
+int ft_animate_enemy(t_slong *game, int i, int j)
+{
+    int flag;
+    int index;
+    void *img;
+
+    index = 0;
+    flag = -1;
+    while (++flag)
+    {
+        img = mlx_xpm_file_to_image(game->mlx, game->map->enemy_img[index], &(int){32}, &(int){32});
+        mlx_put_image_to_window(game->mlx, game->win, img, j * 32, i * 32);
+
+        if (flag == 50)
+        {
+            index++;
+            flag = 0;
+        }
+        if (index == 11)
+            index = 0;
+    }
+    return (1);
+}
+
+int ft_animate_exit(t_slong *game, int i, int j)
+{
+    int flag;
+    int index;
+    void *img;
+
+    index = 0;
+    flag = -1;
+    while (++flag)
+    {
+        img = mlx_xpm_file_to_image(game->mlx, game->map->exit_img[index], &(int){32}, &(int){32});
+        mlx_put_image_to_window(game->mlx, game->win, img, i * 32, 32 * j);
+        printf("\n===> (it's the exit point) <===\n");
+        sleep(1);
+        if (flag == 50)
+        {
+            index++;
+            flag = 0;
+        }
+        if (index == 2)
+            index = 0;
+
+    }
+    return (1);
+}
+
+int ft_animate_collectible(t_slong *game, int i, int j)
+{
+    int flag;
+    int index;
+    void *img;
+
+    index = 0;
+    flag = -1;
+    while (++flag)
+    {
+        img = mlx_xpm_file_to_image(game->mlx, game->map->coll_img[index], &(int){32}, &(int){32});
+        mlx_put_image_to_window(game->mlx, game->win, img, i * 32, 32 * j);
+        printf("img_index = %s\n", game->map->coll_img[index]);
+        if (flag == 50)
+        {
+            index++;
+            flag = 0;
+        }
+        if (index == 8)
+            index = 0;
+    }
+    return (1);
+}
+
+int ft_animate_compenent(t_slong *game)
+{
+    int i;
+    int j;
+
+    i = -1;
+    while (++i < game->map->n_row)
+    {
+        j = -1;
+        while (++j < game->map->n_colums)
+        {
+            if (game->map->grid[i][j] == 'P')
+                ft_animate_player(game, i, j);
+            else if (game->map->grid[i][j] == 'E')
+                ft_animate_exit(game, i, j);
+            else if (game->map->grid[i][j] == 'I')
+                ft_animate_enemy(game, i, j);
+            else if (game->map->grid[i][j]== 'C')
+                ft_animate_collectible(game, i, j);
+        }
+    }
+    return (1);
+}
+
 int ft_init_game(t_slong *game)
 {
-    int with;
+    int width;
     int height;
 
-    with = game->map->n_colums * 32;
+    width = game->map->n_colums * 32;
     height = game->map->n_row * 32;
+    if (height > 1080 || width > 1920) return (printf("error\nSorry but the game can run just width screen's width small than is :1920 and height is small than:1080\n"), ft_destroy_game(game), 0);
     game->player = ft_gen_player(game->map->grid,game->map->n_row, game->map->n_colums);
     if (!game->player)
         return (ft_destroy_game(game), 0);
     game->mlx = mlx_init();
-    game->win = mlx_new_window(game->mlx, with, height, "S0__0Long");
+    game->win = mlx_new_window(game->mlx, width, height, "S0__0Long");
 	if (! ft_gen_window(game))
         return (0);
     // mlx_mouse_hook(game->win, mouse_hook, game);
 	// mlx_hook(game.win ,4 , 1L<<2, ft_close, &game);
 	mlx_key_hook(game->win, key_hook, game);
+    mlx_loop_hook(game->mlx, ft_animate_compenent, game);
+    // var_dump(game->map->grid, game->map->n_row, game->map->n_colums);
     mlx_loop(game->mlx);
     mlx_destroy_window( game->mlx, game->win);
     mlx_destroy_display(game->mlx);
@@ -864,11 +1026,8 @@ int main(int ac, char **av)
     game.mlx = NULL;
     if (!ft_init_requirement(&game, av[1]))
         return (printf("==> MAP ERROR <==\n"), ft_destroy_game(&game), 1);
-    
     if (! ft_validate_map(&game, av[1]))
         return (ft_destroy_game(&game), 1);
-    // printf("\n===inting game      ====(%d)===", ft_init_game(game));
-    // printf("==> MAP ERROR IN VALIDATING <==\n"),
     if (!ft_init_game(&game))
         return (1);
     return 0;

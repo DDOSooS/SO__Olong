@@ -731,118 +731,114 @@ int ft_swap_right(t_slong *game, int x, int y)
     return (1);
 }
 
-int ft_move_up(t_slong *game)
+int ft_move_up(t_slong **game)
 {
-    if (game->map->grid[game->player->x - 1][game->player->y] == '1'
-        || (game->map->grid[game->player->x - 1][game->player->y] == 'E' && game->map->col))
+    if ((*game)->map->grid[(*game)->player->x - 1][(*game)->player->y] == '1'
+        || ((*game)->map->grid[(*game)->player->x - 1][(*game)->player->y] == 'E' && (*game)->map->col))
         return (1);
-    else if (game->map->grid[game->player->x - 1][game->player->y] == 'E' && !game->map->col)
+    else if ((*game)->map->grid[(*game)->player->x - 1][(*game)->player->y] == 'E' && !(*game)->map->col)
     {
-        ft_destroy_game(game);
+        ft_destroy_game(*game);
         exit (0);
     }
-    else if (game->map->grid[game->player->x - 1][game->player->y] == 'I')
+    else if ((*game)->map->grid[(*game)->player->x - 1][(*game)->player->y] == 'I')
     {
-        ft_destroy_game(game);
+        ft_destroy_game(*game);
         exit(0);
     }
     else
-        return (ft_swap_up(game, game->player->x , game->player->y), 1);
+    {
+        printf("CURRENT MOVE IS : %d\n", ++(*game)->cur_moves);
+        return (ft_swap_up(*game, (*game)->player->x , (*game)->player->y), 1);
+    }
     return (1);
 }
 
-int ft_move_down(t_slong *game)
+int ft_move_down(t_slong **game)
 {
-    int x;
-    int y;
-
-    x = game->player->x;
-    y = game->player->y;
-    if (game->map->grid[x + 1][y] == '1'
-        || (game->map->grid[game->player->x + 1][game->player->y] == 'E' && game->map->col))
+    if ((*game)->map->grid[(*game)->player->x + 1][(*game)->player->x] == '1'
+        || ((*game)->map->grid[(*game)->player->x + 1][(*game)->player->y] == 'E' && (*game)->map->col))
         return (1);
-    else if (game->map->grid[x + 1][y] == 'E' && !game->map->col)
+    else if ((*game)->map->grid[(*game)->player->x + 1][(*game)->player->y] == 'E' && !(*game)->map->col)
     {
-        ft_destroy_game(game);
+        ft_destroy_game(*game);
         exit(0);
     }
-    else if (game->map->grid[game->player->x + 1][game->player->y] == 'I')
+    else if ((*game)->map->grid[(*game)->player->x + 1][(*game)->player->y] == 'I')
     {
-        ft_destroy_game(game);
+        ft_destroy_game(*game);
         exit(0);
     }
     else
-        return (ft_swap_down(game, x, y),1);
+    {
+        printf("CURRENT MOVE IS : %d\n", ++(*game)->cur_moves);
+        return (ft_swap_down(*game, (*game)->player->x, (*game)->player->y),1);
+    }
     return (1);
 }
 
-int ft_move_left(t_slong *game)
+int ft_move_left(t_slong **game)
 {
-    int x;
-    int y;
-
-    x = game->player->x;
-    y = game->player->y;
-    if (game->map->grid[x ][y - 1] == '1'
-    || (game->map->grid[game->player->x][game->player->y - 1] == 'E' && game->map->col))
+    if ((*game)->map->grid[(*game)->player->x][(*game)->player->y - 1] == '1'
+    || ((*game)->map->grid[(*game)->player->x][(*game)->player->y - 1] == 'E' && (*game)->map->col))
         return (1); 
-    else if (game->map->grid[x][y - 1] == 'E' && !game->map->col)
+    else if ((*game)->map->grid[(*game)->player->x][(*game)->player->y - 1] == 'E' && !(*game)->map->col)
     {
-        ft_destroy_game(game);
+        ft_destroy_game(*game);
         exit(0);
     }
-    else if (game->map->grid[game->player->x][game->player->y - 1] == 'I')
+    else if ((*game)->map->grid[(*game)->player->x][(*game)->player->y - 1] == 'I')
     {
-        ft_destroy_game(game);
+        ft_destroy_game(*game);
         exit(0);
     }
     else
-        return (ft_swap_left(game, x, y),1);
+    {
+        printf("CURRENT MOVE IS : %d\n", ++(*game)->cur_moves);
+        return (ft_swap_left(*game, (*game)->player->x, (*game)->player->y),1);
+    }
     return (1);
 }
 
-int ft_move_right(t_slong *game)
+int ft_move_right(t_slong **game)
 {
-    int x;
-    int y;
-
-    x = game->player->x;
-    y = game->player->y;
-    if (game->map->grid[x ][y + 1] == '1'
-        || (game->map->grid[game->player->x][game->player->y + 1] == 'E' && game->map->col))
+    if ((*game)->map->grid[(*game)->player->x ][(*game)->player->y + 1] == '1'
+        || ((*game)->map->grid[(*game)->player->x][(*game)->player->y + 1] == 'E' && (*game)->map->col))
         return (1);
-    else if (game->map->grid[x][y + 1] == 'E' && !game->map->col)
+    else if ((*game)->map->grid[(*game)->player->x][(*game)->player->y + 1] == 'E' && !(*game)->map->col)
     {
-        ft_destroy_game(game);
+        ft_destroy_game(*game);
         exit(0);
     }
-    else if (game->map->grid[game->player->x][game->player->y + 1] == 'I')
+    else if ((*game)->map->grid[(*game)->player->x][(*game)->player->y + 1] == 'I')
     {
-        ft_destroy_game(game);
+        ft_destroy_game(*game);
         exit(0);
     }
     else
-        return (ft_swap_right(game, x, y),1);
+    {
+        printf("CURRENT MOVE IS : %d\n", ++(*game)->cur_moves);
+        return (ft_swap_right(*game, (*game)->player->x, (*game)->player->y),1);
+    }
     return (1);
 }
+
+
 int	key_hook(int keycode, t_slong *game)
 {
-    game->cur_moves = game->cur_moves ;
-   
-    printf("CURRENT MOVE IS : %d\n", game->cur_moves++);
     if (keycode == ESC)
     {
         ft_destroy_game(game);
         exit(0);
     }
     else if (keycode == KEY_UP)
-        return (ft_move_up(game));
+        ft_move_up(&game);
     else if (keycode == KEY_DOWN)
-        return (ft_move_down(game));
+        ft_move_down(&game);
     else if (keycode == KEY_LEFT)
-        return (ft_move_left(game));
+        ft_move_left(&game);
     else if (keycode == KEY_RIGHT)
-        return (ft_move_right(game));
+        ft_move_right(&game);
 	return (0);
 }
 
@@ -987,7 +983,7 @@ int main(int ac, char **av)
     if (ac != 2)
         return 1;
     game.player = NULL;
-    game.map = NULL;u
+    game.map = NULL;
     game.cur_moves = 0;
     game.mlx = NULL;
     if (!ft_init_requirement(&game, av[1]))

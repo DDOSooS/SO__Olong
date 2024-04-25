@@ -171,7 +171,7 @@ void ft_set_col_img(t_map **map)
     (*map)->coll_img[1] = "imgs/col/k2.xpm";
     (*map)->coll_img[2] = "imgs/col/k3.xpm";
     (*map)->coll_img[3] = "imgs/col/k4.xpm";
-    (*map)->coll_img[4] = "imgs/col/k5.xpm";
+    (*map)->coll_img[4] = "imgs/col/k5 .xpm";
     (*map)->coll_img[5] = "imgs/col/k6.xpm";
     (*map)->coll_img[6] = "imgs/col/k7.xpm";
     (*map)->coll_img[7] = "imgs/col/k8.xpm";
@@ -194,6 +194,7 @@ t_map   *ft_new_map()
     map->wall_img[1] = "imgs/walls/w2.xpm";
     map->exit_img[0] = "imgs/exit/ex1.xpm";
     map->exit_img[1] = "imgs/exit/ex2.xpm";
+    // map->col_index = 0;
     ft_set_enemy_img(&map);
     ft_set_col_img(&map);
     return (map);
@@ -553,8 +554,6 @@ char *ft_get_absolute_component(t_map *map,int id, int i, int j)
         return ("imgs/walls/r.xpm");
     else if (id == 11)
         return ("imgs/walls/0.xpm");
-    else if (id == 13)
-        return ("imgs/enemy/e1.xpm");
     return (ft_get_wall(map, i, j));
 } 
 
@@ -564,25 +563,16 @@ char *ft_get_image_name(t_slong game, int img_id, int i, int j)
     char *img_name;
 
     img_name = NULL;
-    if ((img_id >= 0 && img_id <= 7) || img_id == 11 || img_id == 12 || img_id == 13)
+    if ((img_id >= 0 && img_id <= 7) || img_id == 11 || img_id == 12 )
         img_name = ft_get_absolute_component(game.map, img_id, i, j);
     else if (img_id == 8)
-    {
-        if (game.player->flag)
-        {
-            img_name =  game.player->img[1];
-            game.player->flag = 0;
-        }
-        else
-        {
-            img_name =  game.player->img[0];
-            game.player->flag = 1;
-        }
-    }
+        img_name = game.map->d_player_img;
     else if (img_id == 9)
-        img_name = "imgs/col/k1.xpm";
+        img_name = game.map->d_col_img;
     else if (img_id == 10)
-        img_name = "imgs/exit/ex1.xpm";
+        img_name = game.map->d_exit_img;
+    else if (img_id == 13)
+        img_name = game.map->d_enemy_img;
     return (img_name);
 }
 
@@ -590,17 +580,6 @@ char *ft_get_image_name(t_slong game, int img_id, int i, int j)
     i need to specify the compenent that well have any animation 
 */
 
-char *ft_strcpy(char *s1, const char *s2)
-{
-    int i = 0;
-    while (s2[i])
-    {
-        s1[i] = s2[i];
-        i++;
-    }
-    s1[i] = '\0';
-    return s1;
-}
 t_player *ft_gen_player(char **grid, int n_rows, int n_col)
 {
     t_player *player;
@@ -654,10 +633,17 @@ int ft_gen_window(t_slong *game)
         {
             flag = ft_get_image_id(game->map->grid[i][j], i , j , game->map); 
             path = ft_get_img_path(game, flag, i, j);
-            if (!path) return (ft_destroy_game(game),0);
+            if (!path)
+            {
+                return ( ft_destroy_game(game),0);
+            }
             img = mlx_xpm_file_to_image(game->mlx, path, &(int){32}, &(int){32});
             if (img == NULL)
-               return(printf ("error\nPleas make sure that ur images is valid"),ft_destroy_game(game), 0);
+            {
+                printf ("erroooooooddddddoor\nPleas make sure that ur images is valid");
+                ft_destroy_game(game);
+                exit(0);
+            }
             mlx_put_image_to_window(game->mlx, game->win, img, j * 32, i * 32);
             mlx_destroy_image(game->mlx, img);        
         }
@@ -861,127 +847,107 @@ int	key_hook(int keycode, t_slong *game)
 }
 
 
-int ft_animate_player(t_slong *game, int i, int j)
+void ft_update_player_img(t_slong **game) 
 {
     int flag;
-    int index;
-    void    *img;
+    void *img;
+    static int index = 0;
 
-    index = 0;
-    flag = -1;
-    while (++flag)
+    flag = 1;
+    while (1)
     {
-        printf("\nflag==(%d) \n",flag);
-        img = mlx_xpm_file_to_image(game->mlx, game->player->img[index], &(int){32}, &(int){32});
-        mlx_put_image_to_window(game->mlx, game->win, img, j * 32, i * 32);
-        if (flag == 100)
+        (*game)->map->d_player_img = (*game)->player->img[index];
+        if (flag % 5000000 == 0)
         {
             index++;
-            flag = 0;
+            break; 
         }
         if (index == 14)
             index = 0;
+        flag++;
     }
-    return (1);
 }
 
-int ft_animate_enemy(t_slong *game, int i, int j)
+void ft_update_enemy_img(t_slong **game) 
 {
     int flag;
-    int index;
     void *img;
+    static int index = 0;
 
-    index = 0;
-    flag = -1;
-    while (++flag)
+    flag = 1;
+    while (1)
     {
-        img = mlx_xpm_file_to_image(game->mlx, game->map->enemy_img[index], &(int){32}, &(int){32});
-        mlx_put_image_to_window(game->mlx, game->win, img, j * 32, i * 32);
-
-        if (flag == 50)
+        (*game)->map->d_enemy_img = (*game)->map->enemy_img[index];
+        if (flag % 50000000 == 0)
         {
             index++;
-            flag = 0;
+            break; 
         }
         if (index == 11)
             index = 0;
+        flag++;
     }
-    return (1);
 }
 
-int ft_animate_exit(t_slong *game, int i, int j)
+int ft_update_col_img(t_slong **game)
 {
     int flag;
-    int index;
     void *img;
+    static int index = 0;
 
-    index = 0;
-    flag = -1;
-    while (++flag)
+    flag = 1;
+    while (1)
     {
-        img = mlx_xpm_file_to_image(game->mlx, game->map->exit_img[index], &(int){32}, &(int){32});
-        mlx_put_image_to_window(game->mlx, game->win, img, i * 32, 32 * j);
-        printf("\n===> (it's the exit point) <===\n");
-        sleep(1);
-        if (flag == 50)
+        (*game)->map->d_col_img = (*game)->map->coll_img[index];
+        if (flag % 500000 == 0)
         {
             index++;
-            flag = 0;
-        }
-        if (index == 2)
-            index = 0;
-
-    }
-    return (1);
-}
-
-int ft_animate_collectible(t_slong *game, int i, int j)
-{
-    int flag;
-    int index;
-    void *img;
-
-    index = 0;
-    flag = -1;
-    while (++flag)
-    {
-        img = mlx_xpm_file_to_image(game->mlx, game->map->coll_img[index], &(int){32}, &(int){32});
-        mlx_put_image_to_window(game->mlx, game->win, img, i * 32, 32 * j);
-        printf("img_index = %s\n", game->map->coll_img[index]);
-        if (flag == 50)
-        {
-            index++;
-            flag = 0;
+            break; 
         }
         if (index == 8)
             index = 0;
+        flag++;
     }
-    return (1);
+    return 1;
 }
 
-int ft_animate_compenent(t_slong *game)
+int ft_update_exit_img(t_slong **game)
 {
-    int i;
-    int j;
+    int flag;
+    void *img;
+    static int index = 0;
 
-    i = -1;
-    while (++i < game->map->n_row)
+    flag = 1;
+    while (1)
     {
-        j = -1;
-        while (++j < game->map->n_colums)
+        (*game)->map->d_exit_img = (*game)->map->exit_img[index];
+        if (flag % 5010000 == 0)
         {
-            if (game->map->grid[i][j] == 'P')
-                ft_animate_player(game, i, j);
-            else if (game->map->grid[i][j] == 'E')
-                ft_animate_exit(game, i, j);
-            else if (game->map->grid[i][j] == 'I')
-                ft_animate_enemy(game, i, j);
-            else if (game->map->grid[i][j]== 'C')
-                ft_animate_collectible(game, i, j);
+            index++;
+            break; 
         }
+        if (index == 2)
+            index = 0;
+        flag++;
     }
-    return (1);
+    return 1;
 }
+
+int ft_animate_component(t_slong *game)
+{
+    ft_update_player_img(&game);
+    ft_update_exit_img(&game);
+    ft_update_enemy_img(&game);
+    ft_update_col_img(&game);
+    if (! ft_gen_window(game))
+    {
+        printf("erooooooooooooooor");
+        ft_destroy_game(game);
+        exit(0);
+    }
+    return 1;
+}
+
 
 int ft_init_game(t_slong *game)
 {
@@ -989,19 +955,19 @@ int ft_init_game(t_slong *game)
     int height;
 
     width = game->map->n_colums * 32;
-    height = game->map->n_row * 32;
+    height = game->map->n_row * 32 +32;
     if (height > 1080 || width > 1920) return (printf("error\nSorry but the game can run just width screen's width small than is :1920 and height is small than:1080\n"), ft_destroy_game(game), 0);
     game->player = ft_gen_player(game->map->grid,game->map->n_row, game->map->n_colums);
     if (!game->player)
         return (ft_destroy_game(game), 0);
     game->mlx = mlx_init();
     game->win = mlx_new_window(game->mlx, width, height, "S0__0Long");
-	if (! ft_gen_window(game))
-        return (0);
+	// if (! ft_gen_window(game))
+    //     return (0);
     // mlx_mouse_hook(game->win, mouse_hook, game);
 	// mlx_hook(game.win ,4 , 1L<<2, ft_close, &game);
 	mlx_key_hook(game->win, key_hook, game);
-    mlx_loop_hook(game->mlx, ft_animate_compenent, game);
+    mlx_loop_hook(game->mlx, ft_animate_component, game);
     // var_dump(game->map->grid, game->map->n_row, game->map->n_colums);
     mlx_loop(game->mlx);
     mlx_destroy_window( game->mlx, game->win);
@@ -1021,7 +987,7 @@ int main(int ac, char **av)
     if (ac != 2)
         return 1;
     game.player = NULL;
-    game.map = NULL;
+    game.map = NULL;u
     game.cur_moves = 0;
     game.mlx = NULL;
     if (!ft_init_requirement(&game, av[1]))

@@ -6,7 +6,7 @@
 /*   By: aghergho < aghergho@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/01 10:52:21 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/24 16:54:57 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/25 18:47:10 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,10 @@ typedef struct map
     char        *enemy_img[11];
     char        *coll_img[8];
     char        *exit_img[2];
+    char        *d_enemy_img;    
+    char        *d_col_img;    
+    char        *d_exit_img;
+    char        *d_player_img;
 }   t_map;
 
 typedef struct  so_long

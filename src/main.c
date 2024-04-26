@@ -756,7 +756,7 @@ int ft_move_up(t_slong **game)
 
 int ft_move_down(t_slong **game)
 {
-    if ((*game)->map->grid[(*game)->player->x + 1][(*game)->player->x] == '1'
+    if ((*game)->map->grid[(*game)->player->x + 1][(*game)->player->y] == '1'
         || ((*game)->map->grid[(*game)->player->x + 1][(*game)->player->y] == 'E' && (*game)->map->col))
         return (1);
     else if ((*game)->map->grid[(*game)->player->x + 1][(*game)->player->y] == 'E' && !(*game)->map->col)

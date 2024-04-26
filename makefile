@@ -4,7 +4,8 @@ CFLAGS =
 LIBRARY = libft/libft.a
 LIBX = minilibx-linux/libmlx_Linux.a
 RM = rm -rf 
-SRC = src/main.c gnl/get_next_line.c gnl/get_next_line_utils.c
+SRC = src/main.c gnl/get_next_line.c gnl/get_next_line_utils.c ft_printf/ft_print_number_format.c \
+	ft_printf/ft_print_string_format.c ft_printf/ft_printf.c
 OBJ = $(SRC:.c=.o)
 
 all : $(NAME)

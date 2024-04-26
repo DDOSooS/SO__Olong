@@ -1,6 +1,7 @@
 
 #include "../includes/so_long.h"
 #include "../minilibx-linux/mlx.h"
+
 void var_dump(char **map, int row, int col);
 
 int ft_check_extension(char *str)
@@ -15,13 +16,16 @@ int ft_check_extension(char *str)
 
 int ft_count_rows(int fd)
 {
-    int n_row = 0;
+    int n_row ;
     char *line;
 
-    while ((line = get_next_line(fd)) != NULL)
+    n_row = 0;
+    line = get_next_line(fd);
+    while (line)
     {
         free(line);
         n_row++;
+        line = get_next_line(fd);
     }
     return n_row;
 }
@@ -177,6 +181,20 @@ void ft_set_col_img(t_map **map)
     (*map)->coll_img[7] = "imgs/col/k8.xpm";
 }
 
+void    ft_set_number_img(t_map **map)
+{
+    (*map)->number_img[0] = "imgs/numbers/0.xpm";
+    (*map)->number_img[1] = "imgs/numbers/1.xpm";
+    (*map)->number_img[2] = "imgs/numbers/2.xpm";
+    (*map)->number_img[3] = "imgs/numbers/3.xpm";
+    (*map)->number_img[4] = "imgs/numbers/4.xpm";
+    (*map)->number_img[5] = "imgs/numbers/5.xpm";
+    (*map)->number_img[6] = "imgs/numbers/6.xpm";
+    (*map)->number_img[7] = "imgs/numbers/7.xpm";
+    (*map)->number_img[8] = "imgs/numbers/8.xpm";
+    (*map)->number_img[9] = "imgs/numbers/9.xpm";
+}
+
 t_map   *ft_new_map()
 {
     t_map *map;
@@ -197,6 +215,7 @@ t_map   *ft_new_map()
     // map->col_index = 0;
     ft_set_enemy_img(&map);
     ft_set_col_img(&map);
+    ft_set_number_img(&map);
     return (map);
 }
 
@@ -310,9 +329,6 @@ void dfs(char ***grid, int i, int y, t_map *map)
 
 void ft_flood_fill(char ***grid, int i, int y, t_map *map)
 {
-    // printf("========\n");
-    // var_dump(*grid, map->n_row, map->n_colums);
-    // printf("========\n");
     dfs(grid, i, y + 1, map);
     dfs(grid, i, y - 1, map);
     dfs(grid, i + 1, y, map);
@@ -338,7 +354,6 @@ int ft_count_collectible(char **grid, int r, int c)
 int ft_check_map_status(char ***grid, int x, int y, t_map *map)
 {
     int collectible = ft_count_collectible(*grid, map->n_row, map->n_colums);
-    // printf("\n==========>number of collectibles : (%d) <============\n", collectible);
     if (collectible != 0)
         return 0;
     if ((*grid)[x][y + 1] == 'v' || (*grid)[x][y - 1] == 'v' || (*grid)[x + 1][y] == 'v' || (*grid)[x - 1][y] == 'v')
@@ -354,9 +369,6 @@ int ft_check_valid_path(t_map *map, int n_rows, int n_cols)
     int y_exit = ft_gety_component_position(map->grid, n_rows, n_cols, 'E');
     char **map1 = ft_init_map(map->grid, n_rows, n_cols);
     map1[x_player][y_player] = 'v';
-    // printf("========\n");
-    // var_dump(map1, n_rows, n_cols);
-    // printf("========\n");
     ft_flood_fill(&map1, x_player, y_player, map);
     if (!ft_check_map_status(&map1, x_exit, y_exit, map))
         return 0;
@@ -442,7 +454,6 @@ int ft_validate_map(t_slong *game, char *map_file)
     if (! ft_check_valid_path(game->map, game->map->n_row, game->map->n_colums))
         return (printf("error\n==>>the no Valid Path <==\n"),0);
     game->map->col = ft_count_collectible(game->map->grid, game->map->n_row, game->map->n_colums);
-    // printf("\n==> map component is Valid <==\n");
     ft_free_grid(game->map->grid, game->map->n_row);
     game->map->grid = malloc(sizeof(char *) * game->map->n_row);
     if (!game->map->grid)
@@ -482,7 +493,7 @@ int ft_get_image_id_helper(char compenent)
     if (compenent == '0')
         return (11);
     else if (compenent == '1')
-        return (12);    // printf("\n====> left || COL[%d]<====\n", game->map->col);
+        return (12);
     return (13);
 }
 
@@ -640,7 +651,7 @@ int ft_gen_window(t_slong *game)
             img = mlx_xpm_file_to_image(game->mlx, path, &(int){32}, &(int){32});
             if (img == NULL)
             {
-                printf ("erroooooooddddddoor\nPleas make sure that ur images is valid");
+                printf ("error\nPleas make sure that ur images is valid");
                 ft_destroy_game(game);
                 exit(0);
             }
@@ -654,6 +665,45 @@ int ft_gen_window(t_slong *game)
 /*
 =============================================================>mlx (code ) and implimentaion<==============================================
 */
+
+int ft_count_number_len(int number)
+{
+    int counter;
+
+    counter = 0;
+    if (!number)
+        return (1);
+    while (number)
+    {
+        number = number / 10;
+        counter++;
+    }
+    return (counter);
+}
+
+
+int    ft_update_number(t_slong **game)
+{
+    int len;
+    void    *img;
+    int y;
+    int  n;
+
+    y = (((*game)->map->n_colums ) * 32) /2;
+    n = (*game)->cur_moves;
+    len = ft_count_number_len((*game)->cur_moves);
+    while (len-- > 0)
+    { 
+        img = mlx_xpm_file_to_image((*game)->mlx,(*game)->map->number_img[n%10], &(int){32}, &(int){32});          
+        if (!img)
+            return(ft_destroy_game(*game), exit(EXIT_FAILURE),0);
+        mlx_put_image_to_window((*game)->mlx, (*game)->win,img, y,((*game)->map->n_row) * 32 );
+        mlx_destroy_image((*game)->mlx, img);
+        n = n / 10;
+        y = y - 32;
+    }
+    return (1);
+}
 
 int ft_swap_up(t_slong *game, int x, int y)
 {
@@ -731,100 +781,100 @@ int ft_swap_right(t_slong *game, int x, int y)
     return (1);
 }
 
-int ft_move_up(t_slong **game)
+int ft_move_up(t_slong *game)
 {
-    if ((*game)->map->grid[(*game)->player->x - 1][(*game)->player->y] == '1'
-        || ((*game)->map->grid[(*game)->player->x - 1][(*game)->player->y] == 'E' && (*game)->map->col))
+    if (game->map->grid[game->player->x - 1][game->player->y] == '1'
+        || (game->map->grid[game->player->x - 1][game->player->y] == 'E' && game->map->col))
         return (1);
-    else if ((*game)->map->grid[(*game)->player->x - 1][(*game)->player->y] == 'E' && !(*game)->map->col)
+    else if (game->map->grid[game->player->x - 1][game->player->y] == 'E' && !game->map->col)
     {
-        ft_destroy_game(*game);
+        ft_destroy_game(game);
         exit (0);
     }
-    else if ((*game)->map->grid[(*game)->player->x - 1][(*game)->player->y] == 'I')
+    else if (game->map->grid[game->player->x - 1][game->player->y] == 'I')
     {
-        ft_destroy_game(*game);
+        ft_destroy_game(game);
         exit(0);
     }
     else
     {
-        printf("CURRENT MOVE IS : %d\n", ++(*game)->cur_moves);
-        return (ft_swap_up(*game, (*game)->player->x , (*game)->player->y), 1);
+        game->cur_moves++;
+        return (ft_swap_up(game, game->player->x , game->player->y), 1);
     }
     return (1);
 }
 
-int ft_move_down(t_slong **game)
+int ft_move_down(t_slong *game)
 {
-    if ((*game)->map->grid[(*game)->player->x + 1][(*game)->player->y] == '1'
-        || ((*game)->map->grid[(*game)->player->x + 1][(*game)->player->y] == 'E' && (*game)->map->col))
+    if (game->map->grid[game->player->x + 1][game->player->y] == '1'
+        || (game->map->grid[game->player->x + 1][game->player->y] == 'E' && game->map->col))
         return (1);
-    else if ((*game)->map->grid[(*game)->player->x + 1][(*game)->player->y] == 'E' && !(*game)->map->col)
+    else if (game->map->grid[game->player->x + 1][game->player->y] == 'E' && !game->map->col)
     {
-        ft_destroy_game(*game);
+        ft_destroy_game(game);
         exit(0);
     }
-    else if ((*game)->map->grid[(*game)->player->x + 1][(*game)->player->y] == 'I')
+    else if (game->map->grid[game->player->x + 1][game->player->y] == 'I')
     {
-        ft_destroy_game(*game);
+        ft_destroy_game(game);
         exit(0);
     }
     else
     {
-        printf("CURRENT MOVE IS : %d\n", ++(*game)->cur_moves);
-        return (ft_swap_down(*game, (*game)->player->x, (*game)->player->y),1);
+        game->cur_moves++;
+        return (ft_swap_down(game, game->player->x, game->player->y),1);
     }
     return (1);
 }
 
-int ft_move_left(t_slong **game)
+int ft_move_left(t_slong *game)
 {
-    if ((*game)->map->grid[(*game)->player->x][(*game)->player->y - 1] == '1'
-    || ((*game)->map->grid[(*game)->player->x][(*game)->player->y - 1] == 'E' && (*game)->map->col))
+    if ((game)->map->grid[(game)->player->x][(game)->player->y - 1] == '1'
+    || ((game)->map->grid[(game)->player->x][(game)->player->y - 1] == 'E' && (game)->map->col))
         return (1); 
-    else if ((*game)->map->grid[(*game)->player->x][(*game)->player->y - 1] == 'E' && !(*game)->map->col)
+    else if ((game)->map->grid[(game)->player->x][(game)->player->y - 1] == 'E' && !(game)->map->col)
     {
-        ft_destroy_game(*game);
+        ft_destroy_game(game);
         exit(0);
     }
-    else if ((*game)->map->grid[(*game)->player->x][(*game)->player->y - 1] == 'I')
+    else if ((game)->map->grid[(game)->player->x][(game)->player->y - 1] == 'I')
     {
-        ft_destroy_game(*game);
+        ft_destroy_game(game);
         exit(0);
     }
     else
     {
-        printf("CURRENT MOVE IS : %d\n", ++(*game)->cur_moves);
-        return (ft_swap_left(*game, (*game)->player->x, (*game)->player->y),1);
+        game->cur_moves++;
+        return (ft_swap_left(game, game->player->x, game->player->y),1);
     }
     return (1);
 }
 
-int ft_move_right(t_slong **game)
+int ft_move_right(t_slong *game)
 {
-    if ((*game)->map->grid[(*game)->player->x ][(*game)->player->y + 1] == '1'
-        || ((*game)->map->grid[(*game)->player->x][(*game)->player->y + 1] == 'E' && (*game)->map->col))
+    if ((game)->map->grid[(game)->player->x ][(game)->player->y + 1] == '1'
+        || ((game)->map->grid[(game)->player->x][(game)->player->y + 1] == 'E' && (game)->map->col))
         return (1);
-    else if ((*game)->map->grid[(*game)->player->x][(*game)->player->y + 1] == 'E' && !(*game)->map->col)
+    else if ((game)->map->grid[(game)->player->x][(game)->player->y + 1] == 'E' && !(game)->map->col)
     {
-        ft_destroy_game(*game);
+        ft_destroy_game(game);
         exit(0);
     }
-    else if ((*game)->map->grid[(*game)->player->x][(*game)->player->y + 1] == 'I')
+    else if ((game)->map->grid[(game)->player->x][(game)->player->y + 1] == 'I')
     {
-        ft_destroy_game(*game);
+        ft_destroy_game(game);
         exit(0);
     }
     else
-    {
-        printf("CURRENT MOVE IS : %d\n", ++(*game)->cur_moves);
-        return (ft_swap_right(*game, (*game)->player->x, (*game)->player->y),1);
+    {   
+        game->cur_moves++;
+        return (ft_swap_right(game, (game)->player->x, (game)->player->y),1);
     }
     return (1);
 }
 
 
-int	key_hook(int keycode, t_slong *game)
+int	ft_move_player(int keycode, t_slong *game)
 {
     if (keycode == ESC)
     {
@@ -832,13 +882,13 @@ int	key_hook(int keycode, t_slong *game)
         exit(0);
     }
     else if (keycode == KEY_UP)
-        ft_move_up(&game);
+        ft_move_up(game);
     else if (keycode == KEY_DOWN)
-        ft_move_down(&game);
+        ft_move_down(game);
     else if (keycode == KEY_LEFT)
-        ft_move_left(&game);
+        ft_move_left(game);
     else if (keycode == KEY_RIGHT)
-        ft_move_right(&game);
+        ft_move_right(game);
 	return (0);
 }
 
@@ -862,7 +912,7 @@ void ft_update_player_img(t_slong **game)
             index = 0;
         flag++;
     }
-}
+} 
 
 void ft_update_enemy_img(t_slong **game) 
 {
@@ -935,15 +985,22 @@ int ft_animate_component(t_slong *game)
     ft_update_exit_img(&game);
     ft_update_enemy_img(&game);
     ft_update_col_img(&game);
+    ft_update_number(&game);
     if (! ft_gen_window(game))
     {
-        printf("erooooooooooooooor");
+        printf("error\n");
         ft_destroy_game(game);
         exit(0);
     }
     return 1;
 }
 
+int ft_close_window( t_slong *game)
+{
+    ft_destroy_game(game);
+    exit(EXIT_SUCCESS);
+    return (1);
+}
 
 int ft_init_game(t_slong *game)
 {
@@ -951,20 +1008,16 @@ int ft_init_game(t_slong *game)
     int height;
 
     width = game->map->n_colums * 32;
-    height = game->map->n_row * 32 +32;
-    if (height > 1080 || width > 1920) return (printf("error\nSorry but the game can run just width screen's width small than is :1920 and height is small than:1080\n"), ft_destroy_game(game), 0);
+    height = game->map->n_row * 32 + 32;
+    // if (height > 1080 || width > 1920) return (printf("error\nSorry but the game can run just width screen's width small than is :1920 and height is small than:1080\n"), ft_destroy_game(game), 0);
     game->player = ft_gen_player(game->map->grid,game->map->n_row, game->map->n_colums);
     if (!game->player)
         return (ft_destroy_game(game), 0);
     game->mlx = mlx_init();
     game->win = mlx_new_window(game->mlx, width, height, "S0__0Long");
-	// if (! ft_gen_window(game))
-    //     return (0);
-    // mlx_mouse_hook(game->win, mouse_hook, game);
-	// mlx_hook(game.win ,4 , 1L<<2, ft_close, &game);
-	mlx_key_hook(game->win, key_hook, game);
+    mlx_hook(game->win, 2, 1L<<0,&ft_move_player,game) ;
+    mlx_hook(game->win, 17, 1L<<5,&ft_close_window,game) ;
     mlx_loop_hook(game->mlx, ft_animate_component, game);
-    // var_dump(game->map->grid, game->map->n_row, game->map->n_colums);
     mlx_loop(game->mlx);
     mlx_destroy_window( game->mlx, game->win);
     mlx_destroy_display(game->mlx);

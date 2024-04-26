@@ -6,7 +6,7 @@
 /*   By: aghergho < aghergho@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/01 10:52:21 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/25 18:47:10 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/26 18:04:10 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include "../libft/libft.h"
 # include <fcntl.h>
 #include <stdlib.h>
+# include "../ft_printf/ft_printf.h"
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 42
@@ -42,7 +43,7 @@ char	*get_next_line(int fd);
 /*
     end  of get_next_line functions
 */
-
+int	ft_printf(const char *format, ...);
 
 typedef struct player
 {
@@ -64,6 +65,7 @@ typedef struct map
     char        *enemy_img[11];
     char        *coll_img[8];
     char        *exit_img[2];
+    char        *number_img[10];
     char        *d_enemy_img;    
     char        *d_col_img;    
     char        *d_exit_img;

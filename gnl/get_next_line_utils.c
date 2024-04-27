@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../includes/so_long.h"
+#include "../includes/so_long.h"
 
 char	*str_sub(char *str, int len)
 {
@@ -19,7 +19,7 @@ char	*str_sub(char *str, int len)
 
 	if (!len)
 		len++;
-	s = (char *) malloc(sizeof(char) * len + 1);
+	s = (char *)malloc(sizeof(char) * len + 1);
 	if (!s)
 		return (NULL);
 	i = 0;

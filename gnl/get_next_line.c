@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aghergho < aghergho@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/01 10:51:40 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/01 14:00:49 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/27 01:48:28 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,13 @@ char	*edit_line(char *str, int len, char **g_line)
 	if (!s)
 		return (NULL);
 	*g_line = str_sub(str + len + 1, ft_strlen(str + len + 1));
-	if (! *g_line)
+	if (!*g_line)
 	{
 		free(s);
 		free(*g_line);
 		return (NULL);
 	}
-	free (str);
+	free(str);
 	return (s);
 }
 
@@ -43,7 +43,7 @@ char	*str_join(char *s1, char *s2)
 		i += ft_strlen(s1);
 	i += ft_strlen(s2);
 	str = (char *)malloc(sizeof(char) * i + 1);
-	if (! str)
+	if (!str)
 		return (NULL);
 	i = 0;
 	while (s1 && s1[i])
@@ -99,7 +99,7 @@ char	*get_next_line(int fd)
 	if (e_line >= 0 && e_line + 1 != ft_strlen(str))
 	{
 		str = edit_line(str, e_line, &line);
-		if (! str)
+		if (!str)
 			return (NULL);
 	}
 	else if ((e_line < 0 || ft_strlen(str) == e_line + 1) && line)

@@ -15,12 +15,12 @@
 void	ft_putchar(char c, int *counter)
 {
 	(*counter)++;
-	write (1, &c, 1);
+	write(1, &c, 1);
 }
 
 void	ft_putstr(const char *str, int *counter)
 {
-	int		i;
+	int	i;
 
 	if (!str)
 		return (ft_putstr("(null)", counter));

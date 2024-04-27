@@ -79,5 +79,5 @@ void	ft_put_hex_nbr_long(unsigned long number, int flag, int *counter)
 void	ft_put_adresse(unsigned long ptr, int *counter)
 {
 	ft_putstr("0x", counter);
-	ft_put_hex_nbr_long((unsigned long) ptr, 0, counter);
+	ft_put_hex_nbr_long((unsigned long)ptr, 0, counter);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_printf.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddos <ddos@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aghergho < aghergho@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/06 09:18:45 by ddos              #+#    #+#             */
-/*   Updated: 2023/12/06 13:54:56 by ddos             ###   ########.fr       */
+/*   Updated: 2024/04/27 01:49:06 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 # include <stdarg.h>
 # include <unistd.h>
-# include <stdio.h>
 
 int		ft_printf(const char *format, ...);
 void	ft_put_nbr(int number, int *counter);

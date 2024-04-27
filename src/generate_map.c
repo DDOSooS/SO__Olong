@@ -6,7 +6,7 @@
 /*   By: aghergho < aghergho@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/26 23:25:22 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/27 01:46:13 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/27 17:33:23 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int	ft_check_extension(char *str)
 {
 	char	*extension;
 
-	extension = ft_strchr(str, '.');
+	extension = ft_strrchr(str, '.');
 	if (!extension)
 		return (0);
 	if (ft_strcmp(extension, ".ber") != 0)
@@ -82,6 +82,7 @@ t_map	*ft_new_map(void)
 	map->wall_img[1] = "imgs/walls/w2.xpm";
 	map->exit_img[0] = "imgs/exit/ex1.xpm";
 	map->exit_img[1] = "imgs/exit/ex2.xpm";
+	map->d_player_img = NULL;
 	ft_set_enemy_img(&map);
 	ft_set_col_img(&map);
 	ft_set_number_img(&map);

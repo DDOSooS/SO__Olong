@@ -6,7 +6,7 @@
 /*   By: aghergho < aghergho@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/27 00:19:41 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/27 02:12:39 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/27 17:35:53 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	ft_update_player_img(t_slong **game)
 			index++;
 			break ;
 		}
-		if (index == 14)
+		if (index == 13)
 			index = 0;
 		flag++;
 	}
@@ -103,9 +103,9 @@ int	ft_animate_component(t_slong *game)
 	ft_update_number(&game);
 	if (!ft_gen_window(game))
 	{
-		ft_printf("error\n");
+		ft_printf("Error\n");
 		ft_destroy_game(game);
-		exit(0);
+		exit(EXIT_FAILURE);
 	}
 	return (1);
 }

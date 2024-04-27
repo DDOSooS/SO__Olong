@@ -29,10 +29,10 @@ $(NAME): $(OBJ) $(LIBRARY) $(LIBX)
 clean:
 	$(RM) $(OBJ)
 	$(MAKE) -C libft clean
-	$(MAKE) -C minilibx-linux clean
 
 fclean: clean
 	$(RM) $(NAME)
+	$(MAKE) -C minilibx-linux clean
 	$(MAKE) -C libft fclean
 
 re: fclean all

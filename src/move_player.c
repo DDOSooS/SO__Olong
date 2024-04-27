@@ -6,7 +6,7 @@
 /*   By: aghergho < aghergho@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/27 00:16:36 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/27 00:18:22 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/27 16:44:56 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,12 @@ int	ft_move_up(t_slong *game)
 		&& !game->map->col)
 	{
 		ft_destroy_game(game);
-		exit(0);
+		exit(EXIT_SUCCESS);
 	}
 	else if (game->map->grid[game->player->x - 1][game->player->y] == 'I')
 	{
 		ft_destroy_game(game);
-		exit(0);
+		exit(EXIT_SUCCESS);
 	}
 	else
 	{
@@ -47,12 +47,12 @@ int	ft_move_down(t_slong *game)
 		&& !game->map->col)
 	{
 		ft_destroy_game(game);
-		exit(0);
+		exit(EXIT_SUCCESS);
 	}
 	else if (game->map->grid[game->player->x + 1][game->player->y] == 'I')
 	{
 		ft_destroy_game(game);
-		exit(0);
+		exit(EXIT_SUCCESS);
 	}
 	else
 	{
@@ -72,12 +72,12 @@ int	ft_move_left(t_slong *game)
 		&& !(game)->map->col)
 	{
 		ft_destroy_game(game);
-		exit(0);
+		exit(EXIT_SUCCESS);
 	}
 	else if ((game)->map->grid[(game)->player->x][(game)->player->y - 1] == 'I')
 	{
 		ft_destroy_game(game);
-		exit(0);
+		exit(EXIT_SUCCESS);
 	}
 	else
 	{
@@ -97,12 +97,12 @@ int	ft_move_right(t_slong *game)
 		&& !(game)->map->col)
 	{
 		ft_destroy_game(game);
-		exit(0);
+		exit(EXIT_SUCCESS);
 	}
 	else if ((game)->map->grid[(game)->player->x][(game)->player->y + 1] == 'I')
 	{
 		ft_destroy_game(game);
-		exit(0);
+		exit(EXIT_SUCCESS);
 	}
 	else
 	{
@@ -117,7 +117,7 @@ int	ft_move_player(int keycode, t_slong *game)
 	if (keycode == ESC)
 	{
 		ft_destroy_game(game);
-		exit(0);
+		exit(EXIT_SUCCESS);
 	}
 	else if (keycode == KEY_UP)
 		ft_move_up(game);

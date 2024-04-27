@@ -6,7 +6,7 @@
 /*   By: aghergho < aghergho@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/27 00:24:23 by aghergho          #+#    #+#             */
-/*   Updated: 2024/04/27 02:02:39 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/04/27 17:36:21 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,8 @@ int	ft_gen_window(t_slong *game)
 			img = mlx_xpm_file_to_image(game->mlx, path, &(int){32},
 					&(int){32});
 			if (img == NULL)
-				return (ft_printf("error\nimages aren't valid"),
-					ft_destroy_game(game), exit(1), 0);
+				return (ft_printf("Error\nimages aren't valid"),
+					ft_destroy_game(game), exit(EXIT_FAILURE), 0);
 			mlx_put_image_to_window(game->mlx, game->win, img, j * 32, i * 32);
 			mlx_destroy_image(game->mlx, img);
 		}
